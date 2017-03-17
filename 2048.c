@@ -11,6 +11,8 @@ unsigned int score = 0;
 unsigned int change = 1;
 unsigned int high_score = 0;
 
+char* save_file_name = "save.game";
+
 char* relation[] = {
     ".",
     "2",
@@ -41,7 +43,7 @@ char board[BOARD_SZ*BOARD_SZ] = {0};
 int free_tiles[BOARD_SZ*BOARD_SZ];
 
 void save_game() {
-    FILE* fp = fopen("save.game", "wb");
+    FILE* fp = fopen(save_file_name, "wb");
     if (fp) {
         if (fwrite(&BOARD_SIZE, sizeof(BOARD_SIZE), 1, fp) != 1) {
             fputs("Could not write the board size to the save game file\n", stderr);
@@ -64,7 +66,7 @@ void save_game() {
 
 int load_game() {
     int loaded = 0;
-    FILE* fp = fopen("save.game", "rb");
+    FILE* fp = fopen(save_file_name, "rb");
     if (fp) {
         int board_size = 0;
         if (fread(&board_size, sizeof(board_size), 1, fp) != 1) {
@@ -131,6 +133,7 @@ void print_board(void) {
         }
         rev = ~rev;
     }
+    mvwprintw(stdscr, (TILE_SIZE/2)*BOARD_SIZE + 1, 0, "High-score: %u", high_score);
 }
 
 void move_cell(int y, int x,
