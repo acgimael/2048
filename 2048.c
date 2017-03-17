@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <time.h>
+#include <string.h>
 
 #define BOARD_SZ 4
 const int BOARD_SIZE = BOARD_SZ;
@@ -225,6 +226,16 @@ void insert_random_tile(void) {
     }
 }
 
+void new_game(void) {
+    change = 0;
+    score = 0;
+    memset(board, 0, (size_t)BOARD_SIZE*BOARD_SIZE);
+    insert_random_tile();
+    insert_random_tile();
+    clear();
+    refresh();
+}
+
 int main() {
     (void)initscr();
 
@@ -242,9 +253,10 @@ int main() {
     if (load_game()) {
         change = 0;
     } else {
-        insert_random_tile();
+        new_game();
     }
 
+ start:
     do {
         if (change) {
             insert_random_tile();
@@ -254,6 +266,11 @@ int main() {
         wmove(stdscr, 0, 0);
         refresh();
         input = getch();
+        switch (input) {
+        case 'n':
+            new_game();
+            goto start;
+        }
         if (input == last) {
             switch (input) {
             case KEY_RIGHT:
