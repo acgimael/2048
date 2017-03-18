@@ -3,8 +3,8 @@
 #include <time.h>
 #include <string.h>
 
-#define BOARD_SZ 4
-const int BOARD_SIZE = BOARD_SZ;
+#define BOARD_SIZE 4
+const int board_size = BOARD_SIZE;
 
 char title[] = "2048";
 
@@ -46,7 +46,7 @@ int free_tiles[BOARD_SZ*BOARD_SZ];
 void save_game() {
     FILE* fp = fopen(save_file_name, "wb");
     if (fp) {
-        if (fwrite(&BOARD_SIZE, sizeof(BOARD_SIZE), 1, fp) != 1) {
+        if (fwrite(&board_size, sizeof(board_size), 1, fp) != 1) {
             fputs("Could not write the board size to the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
@@ -58,7 +58,7 @@ void save_game() {
             fputs("Could not write the high score to the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
-        if (fwrite(board, sizeof(*board), BOARD_SIZE*BOARD_SIZE, fp) != BOARD_SZ*BOARD_SZ) {
+        if (fwrite(board, sizeof(*board), board_size*board_size, fp) != BOARD_SZ*BOARD_SZ) {
             fputs("Could not write the board data to the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
@@ -75,7 +75,7 @@ int load_game() {
             fputs("Could not read the board size from the save game file\n", stderr);
             exit(EXIT_FAILURE);
         } else {
-            if (board_size != BOARD_SIZE) {
+            if (board_size != board_size) {
                 fputs("Save game board size and actual board size do not match\n", stderr);
                 exit(EXIT_FAILURE);
             }
@@ -88,7 +88,7 @@ int load_game() {
             fputs("Could not read the high score from the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
-        if (fread(board, sizeof(*board), BOARD_SIZE*BOARD_SIZE, fp) != BOARD_SZ*BOARD_SZ) {
+        if (fread(board, sizeof(*board), board_size*board_size, fp) != BOARD_SZ*BOARD_SZ) {
             fputs("Could not read the board data from the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
@@ -104,8 +104,8 @@ WINDOW* tiles[BOARD_SZ][BOARD_SZ];
 
 void init_tiles(void) {
     int y, x;
-    for (y = 0; y < BOARD_SIZE; ++y) {
-        for (x = 0; x < BOARD_SIZE; ++x) {
+    for (y = 0; y < board_size; ++y) {
+        for (x = 0; x < board_size; ++x) {
             tiles[y][x] = subwin(stdscr,
                                  TILE_SIZE/2, TILE_SIZE,
                                  1 + y*(TILE_SIZE/2), x*TILE_SIZE);
@@ -115,8 +115,8 @@ void init_tiles(void) {
 
 void del_tiles(void) {
     int y, x;
-    for (y = 0; y < BOARD_SIZE; ++y) {
-        for (x = 0; x < BOARD_SIZE; ++x) {
+    for (y = 0; y < board_size; ++y) {
+        for (x = 0; x < board_size; ++x) {
             delwin(tiles[y][x]);
         }
     }    
@@ -127,44 +127,44 @@ void print_board(void) {
     int rev = 0;
     (void)mvwaddstr(stdscr, 0, 1, "2048");
     (void)mvwprintw(stdscr, 0, 2*TILE_SIZE, "score: %d", score);
-    for (y = 0; y < BOARD_SIZE; ++y) {
-        for (x = 0; x < BOARD_SIZE; ++x) {
+    for (y = 0; y < board_size; ++y) {
+        for (x = 0; x < board_size; ++x) {
             wbkgd(tiles[y][x], ' ' | ((rev)?A_REVERSE:0));
-            if (board[BOARD_SIZE*y + x] < sizeof(relation)) {
-                mvwprintw(tiles[y][x], TILE_SIZE/4, 1, "%7s", relation[(size_t)board[BOARD_SIZE*y + x]]);
+            if (board[board_size*y + x] < sizeof(relation)) {
+                mvwprintw(tiles[y][x], TILE_SIZE/4, 1, "%7s", relation[(size_t)board[board_size*y + x]]);
             } else {
-                mvwprintw(tiles[y][x], TILE_SIZE/4, 1, "2^%d", board[BOARD_SIZE*y + x]);
+                mvwprintw(tiles[y][x], TILE_SIZE/4, 1, "2^%d", board[board_size*y + x]);
             }
             wrefresh(tiles[y][x]);
             rev = ~rev;
         }
         rev = ~rev;
     }
-    mvwprintw(stdscr, (TILE_SIZE/2)*BOARD_SIZE + 1, 0, "High-score: %u", high_score);
+    mvwprintw(stdscr, (TILE_SIZE/2)*board_size + 1, 0, "High-score: %u", high_score);
 }
 
 void move_cell(int y, int x,
                int dy, int dx) {
-    if (((x + dx >= BOARD_SIZE) || (x + dx < 0)) ||
-        ((y + dy >= BOARD_SIZE) || (y + dy < 0))) {
+    if (((x + dx >= board_size) || (x + dx < 0)) ||
+        ((y + dy >= board_size) || (y + dy < 0))) {
         return;
     }
 
-    if (board[BOARD_SIZE*y + x] == 0) {
+    if (board[board_size*y + x] == 0) {
         return;
     }
 
-    if (board[BOARD_SIZE*y + x] == board[BOARD_SIZE*(y + dy) + x + dx]) {
-        ++board[BOARD_SIZE*(y + dy) + x + dx];
-        board[BOARD_SIZE*(y) + x] = 0;
-        score += (1 << board[BOARD_SIZE*(y + dy) + x + dx]);
+    if (board[board_size*y + x] == board[board_size*(y + dy) + x + dx]) {
+        ++board[board_size*(y + dy) + x + dx];
+        board[board_size*(y) + x] = 0;
+        score += (1 << board[board_size*(y + dy) + x + dx]);
         if (score > high_score) {
             high_score = score;
         }
         change = 1;
-    } else if (board[BOARD_SIZE*(y + dy) + x + dx] == 0) {
-        board[BOARD_SIZE*(y + dy) + x + dx] = board[BOARD_SIZE*(y) + x];
-        board[BOARD_SIZE*(y) + x] = 0;
+    } else if (board[board_size*(y + dy) + x + dx] == 0) {
+        board[board_size*(y + dy) + x + dx] = board[board_size*(y) + x];
+        board[board_size*(y) + x] = 0;
         change = 1;
         move_cell(y + dy, x + dx, dy, dx);
     }
@@ -177,8 +177,8 @@ void move_cell(int y, int x,
 
 void right() {
     int y, x;
-    for (y = 0; y < BOARD_SIZE; ++y) {
-        for (x = BOARD_SIZE - 2; x >= 0; --x) {
+    for (y = 0; y < board_size; ++y) {
+        for (x = board_size - 2; x >= 0; --x) {
             move_cell_right(y, x);
         }
     }
@@ -186,8 +186,8 @@ void right() {
 
 void down() {
     int y, x;
-    for (x = 0; x < BOARD_SIZE; ++x) {
-        for (y = BOARD_SIZE - 2; y >= 0; --y) {
+    for (x = 0; x < board_size; ++x) {
+        for (y = board_size - 2; y >= 0; --y) {
             move_cell_down(y, x);
         }
     }
@@ -195,8 +195,8 @@ void down() {
 
 void left() {
     int y, x;
-    for (y = 0; y < BOARD_SIZE; ++y) {
-        for (x = 1; x < BOARD_SIZE; ++x) {
+    for (y = 0; y < board_size; ++y) {
+        for (x = 1; x < board_size; ++x) {
             move_cell_left(y, x);
         }
     }
@@ -204,8 +204,8 @@ void left() {
 
 void up() {
     int y, x;
-    for (x = 0; x < BOARD_SIZE; ++x) {
-        for (y = 1; y < BOARD_SIZE; ++y) {
+    for (x = 0; x < board_size; ++x) {
+        for (y = 1; y < board_size; ++y) {
             move_cell_up(y, x);
         }
     }
@@ -214,7 +214,7 @@ void up() {
 int refresh_free_tiles(void) {
     int i;
     int count = 0;
-    for (i = 0; i < BOARD_SIZE*BOARD_SIZE; ++i) {
+    for (i = 0; i < board_size*board_size; ++i) {
         if (board[i] == 0) {
             free_tiles[count] = i;
             ++count;
@@ -235,7 +235,7 @@ void insert_random_tile(void) {
 void new_game(void) {
     change = 0;
     score = 0;
-    memset(board, 0, (size_t)BOARD_SIZE*BOARD_SIZE);
+    memset(board, 0, (size_t)board_size*board_size);
     insert_random_tile();
     insert_random_tile();
     clear();
