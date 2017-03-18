@@ -62,6 +62,7 @@ void save_game() {
             fputs("Could not write the board data to the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
+        fclose(fp);
     }
 }
 
@@ -92,6 +93,7 @@ int load_game() {
             exit(EXIT_FAILURE);
         }
         loaded = 1;
+        fclose(fp);
     }
     return loaded;
 }
