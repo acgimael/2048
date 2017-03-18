@@ -12,32 +12,37 @@ unsigned int score = 0;
 unsigned int change = 0;
 unsigned int high_score = 0;
 
+unsigned int color = 1;
+
 char* save_file_name = "save.game";
 
-char* relation[] = {
-    ".",
-    "2",
-    "4",
-    "8",
-    "16",
-    "32",
-    "64",
-    "128",
-    "256",
-    "512",
-    "1024",
-    "2048",
-    "4096",
-    "8192",
-    "16384",
-    "32768",
-    "65536",
-    "131072",
-    "262144",
-    "524288",
-    "1048576",
-    "2097152",
-    "4194304"
+struct {
+    char* str;
+    chtype col;
+} relation[] = {
+    {".", COLOR_PAIR(0)},
+    {"2", COLOR_PAIR(2)},
+    {"4", COLOR_PAIR(3)},
+    {"8", COLOR_PAIR(4)},
+    {"16", COLOR_PAIR(5)},
+    {"32", COLOR_PAIR(6)},
+    {"64", COLOR_PAIR(7)},
+    {"128", COLOR_PAIR(8)},
+    {"256", COLOR_PAIR(9)},
+    {"512", COLOR_PAIR(10)},
+    {"1024", COLOR_PAIR(11)},
+    {"2048", COLOR_PAIR(12)},
+    {"4096", COLOR_PAIR(13)},
+    {"8192", COLOR_PAIR(14)},
+    {"16384", COLOR_PAIR(15)},
+    {"32768", COLOR_PAIR(16)},
+    {"65536", COLOR_PAIR(17)},
+    {"131072", COLOR_PAIR(18)},
+    {"262144", COLOR_PAIR(19)},
+    {"524288", COLOR_PAIR(20)},
+    {"1048576", COLOR_PAIR(21)},
+    {"2097152", COLOR_PAIR(22)},
+    {"4194304", COLOR_PAIR(23)}
 };
 
 unsigned char board[BOARD_SIZE*BOARD_SIZE] = {0};
@@ -129,11 +134,23 @@ void print_board(void) {
     (void)mvwprintw(stdscr, 0, 2*TILE_SIZE, "score: %d", score);
     for (y = 0; y < board_size; ++y) {
         for (x = 0; x < board_size; ++x) {
-            wbkgd(tiles[y][x], ' ' | ((rev)?A_REVERSE:0));
-            if (board[board_size*y + x] < sizeof(relation)) {
-                mvwprintw(tiles[y][x], TILE_SIZE/4, 1, "%7s", relation[(size_t)board[board_size*y + x]]);
+            if (!color) {
+                wbkgd(tiles[y][x], ' ' | ((rev)?A_REVERSE:0));
+            }
+            if (board[board_size*y + x] < 23) { /* magic number, count
+                                                   the number of items
+                                                   in the relation
+                                                   array */
+                if (color)
+                    wbkgd(tiles[y][x], ' ' | relation[board[(size_t)board_size*y + x]].col);
+
+                mvwprintw(tiles[y][x],
+                          TILE_SIZE/4, 1,
+                          "%7s", relation[(size_t)board[board_size*y + x]].str);
             } else {
-                mvwprintw(tiles[y][x], TILE_SIZE/4, 1, "2^%d", board[board_size*y + x]);
+                mvwprintw(tiles[y][x],
+                          TILE_SIZE/4, 1,
+                          "2^%d", board[board_size*y + x]);
             }
             wrefresh(tiles[y][x]);
             rev = ~rev;
@@ -242,8 +259,45 @@ void new_game(void) {
     refresh();
 }
 
+void do_initialize_colors(void) {
+    start_color();
+    color = 1;
+    init_pair(1, COLOR_BLACK, COLOR_RED);
+    init_pair(2, COLOR_BLACK, COLOR_GREEN);
+    init_pair(3, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(4, COLOR_BLACK, COLOR_BLUE);
+    init_pair(5, COLOR_BLACK, COLOR_MAGENTA);
+    init_pair(6, COLOR_BLACK, COLOR_CYAN);
+    init_pair(7, COLOR_BLACK, COLOR_WHITE);
+    init_pair(8, COLOR_RED, COLOR_BLACK);
+    init_pair(9, COLOR_RED, COLOR_GREEN);
+    init_pair(10, COLOR_RED, COLOR_YELLOW);
+    init_pair(11, COLOR_RED, COLOR_BLUE);
+    init_pair(12, COLOR_RED, COLOR_MAGENTA);
+    init_pair(13, COLOR_RED, COLOR_CYAN);
+    init_pair(14, COLOR_RED, COLOR_WHITE);
+    init_pair(15, COLOR_GREEN, COLOR_RED);
+    init_pair(16, COLOR_GREEN, COLOR_WHITE);
+    init_pair(17, COLOR_GREEN, COLOR_YELLOW);
+    init_pair(18, COLOR_GREEN, COLOR_BLUE);
+    init_pair(19, COLOR_GREEN, COLOR_MAGENTA);
+    init_pair(20, COLOR_GREEN, COLOR_CYAN);
+    init_pair(21, COLOR_GREEN, COLOR_WHITE);
+    init_pair(22, COLOR_YELLOW, COLOR_RED);
+    init_pair(23, COLOR_YELLOW, COLOR_GREEN);
+    init_pair(24, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(25, COLOR_YELLOW, COLOR_BLUE);
+    init_pair(26, COLOR_YELLOW, COLOR_MAGENTA);
+    init_pair(27, COLOR_YELLOW, COLOR_CYAN);
+    init_pair(28, COLOR_YELLOW, COLOR_WHITE);
+}
+
 int main() {
     (void)initscr();
+
+    if (has_colors()) {
+        do_initialize_colors();
+    }
 
     srand(time(NULL));
 
