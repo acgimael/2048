@@ -40,8 +40,8 @@ char* relation[] = {
     "4194304"
 };
 
-unsigned char board[BOARD_SZ*BOARD_SZ] = {0};
-int free_tiles[BOARD_SZ*BOARD_SZ];
+unsigned char board[BOARD_SIZE*BOARD_SIZE] = {0};
+int free_tiles[BOARD_SIZE*BOARD_SIZE];
 
 void save_game() {
     FILE* fp = fopen(save_file_name, "wb");
@@ -58,7 +58,7 @@ void save_game() {
             fputs("Could not write the high score to the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
-        if (fwrite(board, sizeof(*board), board_size*board_size, fp) != BOARD_SZ*BOARD_SZ) {
+        if (fwrite(board, sizeof(*board), board_size*board_size, fp) != BOARD_SIZE*BOARD_SIZE) {
             fputs("Could not write the board data to the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
@@ -70,12 +70,12 @@ int load_game() {
     int loaded = 0;
     FILE* fp = fopen(save_file_name, "rb");
     if (fp) {
-        int board_size = 0;
-        if (fread(&board_size, sizeof(board_size), 1, fp) != 1) {
+        int read_board_size = 0;
+        if (fread(&read_board_size, sizeof(board_size), 1, fp) != 1) {
             fputs("Could not read the board size from the save game file\n", stderr);
             exit(EXIT_FAILURE);
         } else {
-            if (board_size != board_size) {
+            if (read_board_size != board_size) {
                 fputs("Save game board size and actual board size do not match\n", stderr);
                 exit(EXIT_FAILURE);
             }
@@ -88,7 +88,7 @@ int load_game() {
             fputs("Could not read the high score from the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
-        if (fread(board, sizeof(*board), board_size*board_size, fp) != BOARD_SZ*BOARD_SZ) {
+        if (fread(board, sizeof(*board), board_size*board_size, fp) != BOARD_SIZE*BOARD_SIZE) {
             fputs("Could not read the board data from the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
@@ -98,7 +98,7 @@ int load_game() {
     return loaded;
 }
 
-WINDOW* tiles[BOARD_SZ][BOARD_SZ];
+WINDOW* tiles[BOARD_SIZE][BOARD_SIZE];
 
 #define TILE_SIZE 9
 
