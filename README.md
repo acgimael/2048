@@ -16,7 +16,7 @@ I found not to have the move triggered multiple times.
 Press 'q' to quit.
 Press 'n' to start a new game.
 
-### Design decisions
+## Design decisions
 
 a.k.a.
 
@@ -69,7 +69,7 @@ at:
 
   Why I did it:
 
-      Who would really care for this is probably the saner question.
+      Who would really care for this is probably a saner question.
 
 - Using goto:
 
