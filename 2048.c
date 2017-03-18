@@ -9,7 +9,7 @@ const int BOARD_SIZE = BOARD_SZ;
 char title[] = "2048";
 
 unsigned int score = 0;
-unsigned int change = 1;
+unsigned int change = 0;
 unsigned int high_score = 0;
 
 char* save_file_name = "save.game";
@@ -40,7 +40,7 @@ char* relation[] = {
     "4194304"
 };
 
-char board[BOARD_SZ*BOARD_SZ] = {0};
+unsigned char board[BOARD_SZ*BOARD_SZ] = {0};
 int free_tiles[BOARD_SZ*BOARD_SZ];
 
 void save_game() {
@@ -75,7 +75,7 @@ int load_game() {
             exit(EXIT_FAILURE);
         } else {
             if (board_size != BOARD_SIZE) {
-                fputs("Save game board size and actual board size do not match\n", stderr);                
+                fputs("Save game board size and actual board size do not match\n", stderr);
                 exit(EXIT_FAILURE);
             }
         }
@@ -128,7 +128,11 @@ void print_board(void) {
     for (y = 0; y < BOARD_SIZE; ++y) {
         for (x = 0; x < BOARD_SIZE; ++x) {
             wbkgd(tiles[y][x], ' ' | ((rev)?A_REVERSE:0));
-            mvwprintw(tiles[y][x], TILE_SIZE/4, 1, "%7s", relation[(size_t)board[BOARD_SIZE*y + x]]);
+            if (board[BOARD_SIZE*y + x] < sizeof(relation)) {
+                mvwprintw(tiles[y][x], TILE_SIZE/4, 1, "%7s", relation[(size_t)board[BOARD_SIZE*y + x]]);
+            } else {
+                mvwprintw(tiles[y][x], TILE_SIZE/4, 1, "2^%d", board[BOARD_SIZE*y + x]);
+            }
             wrefresh(tiles[y][x]);
             rev = ~rev;
         }
@@ -250,9 +254,7 @@ int main() {
     int last = 0;
     int input = 0;
 
-    if (load_game()) {
-        change = 0;
-    } else {
+    if (!load_game()) {
         new_game();
     }
 
