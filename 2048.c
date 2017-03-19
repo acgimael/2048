@@ -131,18 +131,23 @@ void del_tiles(void) {
 void print_board(void) {
     int y, x;
     int rev = 0;
-    (void)mvwaddstr(stdscr, 0, 1, "2048");
+    (void)mvwaddstr(stdscr, 0, 1, title);
     (void)mvwprintw(stdscr, 0, 2*TILE_SIZE, "score: %d", score);
     for (y = 0; y < board_size; ++y) {
         for (x = 0; x < board_size; ++x) {
-            if (!color) {
+            if (color) {
+                if (board[board_size*y + x] <
+                    (sizeof(relation)/sizeof(struct number_to_color))) {
+                    wbkgd(tiles[y][x], ' ' |
+                          relation[board[(size_t)board_size*y + x]].col);
+                } else {
+                    wbkgd(tiles[y][x], ' ' | COLOR_PAIR(0));
+                }
+            } else {
                 wbkgd(tiles[y][x], ' ' | ((rev)?A_REVERSE:0));
             }
             if (board[board_size*y + x] <
                 (sizeof(relation)/sizeof(struct number_to_color))) {
-                if (color)
-                    wbkgd(tiles[y][x], ' ' |
-                          relation[board[(size_t)board_size*y + x]].col);
 
                 mvwprintw(tiles[y][x],
                           TILE_SIZE/4, 1,
