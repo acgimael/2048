@@ -6,6 +6,8 @@
 #define BOARD_SIZE 4
 const int board_size = BOARD_SIZE;
 
+#define ARR_LEN(arr) (sizeof((arr))/sizeof((arr)[0]))
+
 char title[] = "2048";
 
 unsigned int score = 0;
@@ -137,7 +139,7 @@ void print_board(void) {
         for (x = 0; x < board_size; ++x) {
             if (color) {
                 if (board[board_size*y + x] <
-                    (sizeof(relation)/sizeof(struct number_to_color))) {
+                    ARR_LEN(relation)) {
                     wbkgd(tiles[y][x], ' ' |
                           relation[board[(size_t)board_size*y + x]].col);
                 } else {
@@ -147,7 +149,7 @@ void print_board(void) {
                 wbkgd(tiles[y][x], ' ' | ((rev)?A_REVERSE:0));
             }
             if (board[board_size*y + x] <
-                (sizeof(relation)/sizeof(struct number_to_color))) {
+                ARR_LEN(relation)) {
 
                 mvwprintw(tiles[y][x],
                           TILE_SIZE/4, 1,
