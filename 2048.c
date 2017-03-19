@@ -12,11 +12,12 @@ unsigned int score = 0;
 unsigned int change = 0;
 unsigned int high_score = 0;
 
-unsigned int color = 1;
+unsigned int enable_colors = 1;
+unsigned int color = 0;
 
 char* save_file_name = "save.game";
 
-struct {
+struct number_to_color {
     char* str;
     chtype col;
 } relation[] = {
@@ -137,27 +138,31 @@ void print_board(void) {
             if (!color) {
                 wbkgd(tiles[y][x], ' ' | ((rev)?A_REVERSE:0));
             }
-            if (board[board_size*y + x] < 23) { /* magic number, count
-                                                   the number of items
-                                                   in the relation
-                                                   array */
+            if (board[board_size*y + x] <
+                (sizeof(relation)/sizeof(struct number_to_color))) {
                 if (color)
-                    wbkgd(tiles[y][x], ' ' | relation[board[(size_t)board_size*y + x]].col);
+                    wbkgd(tiles[y][x], ' ' |
+                          relation[board[(size_t)board_size*y + x]].col);
 
                 mvwprintw(tiles[y][x],
                           TILE_SIZE/4, 1,
-                          "%7s", relation[(size_t)board[board_size*y + x]].str);
+                          "%7s",
+                          relation[(size_t)board[board_size*y + x]].str);
             } else {
                 mvwprintw(tiles[y][x],
                           TILE_SIZE/4, 1,
-                          "2^%d", board[board_size*y + x]);
+                          "2^%d",
+                          board[board_size*y + x]);
             }
             wrefresh(tiles[y][x]);
             rev = ~rev;
         }
         rev = ~rev;
     }
-    mvwprintw(stdscr, (TILE_SIZE/2)*board_size + 1, 0, "High-score: %u", high_score);
+    mvwprintw(stdscr,
+              (TILE_SIZE/2)*board_size + 1, 0,
+              "High-score: %u",
+              high_score);
 }
 
 void move_cell(int y, int x,
@@ -295,7 +300,7 @@ void do_initialize_colors(void) {
 int main() {
     (void)initscr();
 
-    if (has_colors()) {
+    if (enable_colors && has_colors()) {
         do_initialize_colors();
     }
 
