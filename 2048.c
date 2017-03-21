@@ -19,33 +19,30 @@ unsigned int color = 0;
 
 char* save_file_name = "save.game";
 
-struct number_to_color {
-    char* str;
-    chtype col;
-} relation[] = {
-    {".", COLOR_PAIR(0)},
-    {"2", COLOR_PAIR(2)},
-    {"4", COLOR_PAIR(3)},
-    {"8", COLOR_PAIR(4)},
-    {"16", COLOR_PAIR(5)},
-    {"32", COLOR_PAIR(6)},
-    {"64", COLOR_PAIR(7)},
-    {"128", COLOR_PAIR(8)},
-    {"256", COLOR_PAIR(9)},
-    {"512", COLOR_PAIR(10)},
-    {"1024", COLOR_PAIR(11)},
-    {"2048", COLOR_PAIR(12)},
-    {"4096", COLOR_PAIR(13)},
-    {"8192", COLOR_PAIR(14)},
-    {"16384", COLOR_PAIR(15)},
-    {"32768", COLOR_PAIR(16)},
-    {"65536", COLOR_PAIR(17)},
-    {"131072", COLOR_PAIR(18)},
-    {"262144", COLOR_PAIR(19)},
-    {"524288", COLOR_PAIR(20)},
-    {"1048576", COLOR_PAIR(21)},
-    {"2097152", COLOR_PAIR(22)},
-    {"4194304", COLOR_PAIR(23)}
+char* relation[] = {
+    ".",
+    "2",
+    "4",
+    "8",
+    "16",
+    "32",
+    "64",
+    "128",
+    "256",
+    "512",
+    "1024",
+    "2048",
+    "4096",
+    "8192",
+    "16384",
+    "32768",
+    "65536",
+    "131072",
+    "262144",
+    "524288",
+    "1048576",
+    "2097152",
+    "4194304"
 };
 
 unsigned char board[BOARD_SIZE*BOARD_SIZE] = {0};
@@ -141,7 +138,7 @@ void print_board(void) {
                 if (board[board_size*y + x] <
                     ARR_LEN(relation)) {
                     wbkgd(tiles[y][x], ' ' |
-                          relation[board[(size_t)board_size*y + x]].col);
+                          COLOR_PAIR(board[(size_t)board_size*y + x]));
                 } else {
                     wbkgd(tiles[y][x], ' ' | COLOR_PAIR(0));
                 }
@@ -154,7 +151,7 @@ void print_board(void) {
                 mvwprintw(tiles[y][x],
                           TILE_SIZE/4, 1,
                           "%7s",
-                          relation[(size_t)board[board_size*y + x]].str);
+                          relation[(size_t)board[board_size*y + x]]);
             } else {
                 mvwprintw(tiles[y][x],
                           TILE_SIZE/4, 1,
@@ -327,7 +324,7 @@ int main() {
     }
 
  start:
-    do {
+    while (1) {
         if (change) {
             insert_random_tile();
             change = 0;
@@ -340,6 +337,8 @@ int main() {
         case 'n':
             new_game();
             goto start;
+        case 'q':
+            goto end;
         }
         if (input == last) {
             switch (input) {
@@ -360,7 +359,8 @@ int main() {
         } else {
             last = input;
         }
-    } while (input != 'q');
+    }
+ end:
     save_game();
 
     del_tiles();
