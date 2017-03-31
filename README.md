@@ -8,6 +8,42 @@ It saves your game when you 'q'uit, loads it when you run the game.
 
 There is no game over detection, and I will make some improvements...
 
+## Installing
+
+You may have to install ncurses:
+
+On Ubuntu/Linux Mint:
+```sh
+sudo apt-get install ncurses-dev # either this or something similar
+```
+
+On Fedora:
+```sh
+sudo dnf install ncurses-devel
+```
+
+then,
+
+```sh
+git clone https://github.com/acgimael/2048.git
+cd 2048
+make
+```
+
+If everything is ok:
+```sh
+./2048
+```
+
+The game depends on ncurses, and has been tested on the Fedora 25 with
+the following:
+
+- gcc 6.3.1
+- gnu make 4.1
+- ncurses 6
+
+and on Ubuntu 14.04
+
 ## Playing
 
 Press any of the arrow keys **twice** to make a move. This was the way
