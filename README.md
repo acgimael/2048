@@ -35,8 +35,8 @@ If everything is ok:
 ./2048
 ```
 
-The game depends on ncurses, and has been tested on the Fedora 25 with
-the following:
+The game depends on ncurses, and has been tested on Fedora 25 with the
+following:
 
 - gcc 6.3.1
 - gnu make 4.1
