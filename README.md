@@ -14,7 +14,7 @@ You may have to install ncurses:
 
 On Ubuntu/Linux Mint:
 ```sh
-sudo apt-get install ncurses-dev # either this or something similar
+sudo apt-get install libncurses5-dev
 ```
 
 On Fedora:
