@@ -253,7 +253,7 @@ void insert_random_tile(void) {
     int count = refresh_free_tiles();
     if (count) {
         int r = rand() % count;
-        int face = rand() % 2 + 1;
+        int face = ((rand() % 10) < 9)?1:2;
         board[free_tiles[r]] = face;
     }
 }
