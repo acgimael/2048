@@ -1,14 +1,13 @@
+#include "2048.h"
+
 #include <stdlib.h>
-#include <ncurses.h>
-#include <time.h>
 #include <string.h>
 
-#define BOARD_SIZE 4
 const int board_size = BOARD_SIZE;
 
 #define ARR_LEN(arr) (sizeof((arr))/sizeof((arr)[0]))
 
-char title[] = "2048";
+const char* const title = "2048";
 
 unsigned int score = 0;
 unsigned int change = 0;
@@ -17,9 +16,9 @@ unsigned int high_score = 0;
 unsigned int enable_colors = 1;
 unsigned int color = 0;
 
-char* save_file_name = "save.game";
+const char* const save_file_name = "save.game";
 
-char* relation[] = {
+const char* relation[] = {
     ".",
     "2",
     "4",
@@ -48,7 +47,7 @@ char* relation[] = {
 unsigned char board[BOARD_SIZE*BOARD_SIZE] = {0};
 int free_tiles[BOARD_SIZE*BOARD_SIZE];
 
-void save_game() {
+void save_game(void) {
     FILE* fp = fopen(save_file_name, "wb");
     if (fp) {
         if (fwrite(&board_size, sizeof(board_size), 1, fp) != 1) {
@@ -71,7 +70,7 @@ void save_game() {
     }
 }
 
-int load_game() {
+int load_game(void) {
     int loaded = 0;
     FILE* fp = fopen(save_file_name, "rb");
     if (fp) {
@@ -201,7 +200,7 @@ void move_cell(int y, int x,
 #define move_cell_left(y, x) move_cell(y, x, 0, -1)
 #define move_cell_up(y, x) move_cell(y, x, -1, 0)
 
-void right() {
+void right(void) {
     int y, x;
     for (y = 0; y < board_size; ++y) {
         for (x = board_size - 2; x >= 0; --x) {
@@ -210,7 +209,7 @@ void right() {
     }
 }
 
-void down() {
+void down(void) {
     int y, x;
     for (x = 0; x < board_size; ++x) {
         for (y = board_size - 2; y >= 0; --y) {
@@ -219,7 +218,7 @@ void down() {
     }
 }
 
-void left() {
+void left(void) {
     int y, x;
     for (y = 0; y < board_size; ++y) {
         for (x = 1; x < board_size; ++x) {
@@ -228,7 +227,7 @@ void left() {
     }
 }
 
-void up() {
+void up(void) {
     int y, x;
     for (x = 0; x < board_size; ++x) {
         for (y = 1; y < board_size; ++y) {
@@ -299,72 +298,4 @@ void do_initialize_colors(void) {
     init_pair(26, COLOR_YELLOW, COLOR_MAGENTA);
     init_pair(27, COLOR_YELLOW, COLOR_CYAN);
     init_pair(28, COLOR_YELLOW, COLOR_WHITE);
-}
-
-int main() {
-    (void)initscr();
-
-    if (enable_colors && has_colors()) {
-        do_initialize_colors();
-    }
-
-    srand(time(NULL));
-
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-
-    init_tiles();
-
-    int last = 0;
-    int input = 0;
-
-    if (!load_game()) {
-        new_game();
-    }
-
- start:
-    while (1) {
-        if (change) {
-            insert_random_tile();
-            change = 0;
-        }
-        print_board();
-        wmove(stdscr, 0, 0);
-        refresh();
-        input = getch();
-        switch (input) {
-        case 'n':
-            new_game();
-            goto start;
-        case 'q':
-            goto end;
-        }
-        if (input == last) {
-            switch (input) {
-            case KEY_RIGHT:
-                right();
-                break;
-            case KEY_DOWN:
-                down();
-                break;
-            case KEY_LEFT:
-                left();
-                break;
-            case KEY_UP:
-                up();
-                break;
-            }
-            last = 0;
-        } else {
-            last = input;
-        }
-    }
- end:
-    save_game();
-
-    del_tiles();
-
-    endwin();
-    return EXIT_SUCCESS;
 }

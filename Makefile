@@ -6,9 +6,9 @@ NAME = 2048
 
 all: $(NAME)
 
-$(NAME).o: $(NAME).c
+$(NAME): $(NAME).o main.o
 
 .phony: all clean
 
 clean:
-	rm -f $(NAME) $(NAME).o
+	rm -f $(NAME) *.o
