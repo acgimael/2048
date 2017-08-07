@@ -5,6 +5,8 @@
 
 #define BOARD_SIZE 4
 
+#define TILE_SIZE 9
+
 extern const int board_size;
 
 extern const char* const title;
@@ -21,13 +23,11 @@ extern unsigned char board[];
 
 extern int free_tiles[];
 
+extern WINDOW* tiles[BOARD_SIZE][BOARD_SIZE];
+
 void save_game(void);
 
 int load_game(void);
-
-extern WINDOW* tiles[BOARD_SIZE][BOARD_SIZE];
-
-#define TILE_SIZE 9
 
 void init_tiles(void);
 
