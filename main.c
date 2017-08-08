@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <time.h>
 
 #include "2048.h"
 
@@ -18,7 +17,6 @@ int main() {
 
     init_tiles();
 
-    int last = 0;
     int input = 0;
 
     if (!load_game()) {
@@ -41,26 +39,21 @@ int main() {
             goto start;
         case 'q':
             goto end;
+        case KEY_RIGHT:
+            right();
+            break;
+        case KEY_DOWN:
+            down();
+            break;
+        case KEY_LEFT:
+            left();
+            break;
+        case KEY_UP:
+            up();
+            break;
         }
-        if (input == last) {
-            switch (input) {
-            case KEY_RIGHT:
-                right();
-                break;
-            case KEY_DOWN:
-                down();
-                break;
-            case KEY_LEFT:
-                left();
-                break;
-            case KEY_UP:
-                up();
-                break;
-            }
-            last = 0;
-        } else {
-            last = input;
-        }
+        input = 0;
+        nanosleep(&sleep, NULL);
     }
  end:
     save_game();

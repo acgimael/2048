@@ -2,6 +2,7 @@
 #define HEADER_2048
 
 #include <ncurses.h>
+#include <time.h>
 
 #define BOARD_SIZE 4
 
@@ -16,6 +17,8 @@ extern unsigned int high_score;
 extern unsigned int enable_colors;
 extern unsigned int color;
 extern const char* const save_file_name;
+
+extern struct timespec sleep;
 
 extern const char* relation[];
 

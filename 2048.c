@@ -16,6 +16,8 @@ unsigned int high_score = 0;
 unsigned int enable_colors = 1;
 unsigned int color = 0;
 
+struct timespec sleep = {0, 125000000};
+
 const char* const save_file_name = "save.game";
 
 const char* relation[] = {
