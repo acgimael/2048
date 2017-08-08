@@ -4,7 +4,7 @@ A simple ncurses implementation of 2048
 
 Mostly wrote this to learn how to use ncurses
 
-It saves your game when you 'q'uit, loads it when you run the game.
+It saves your game when you quit, loads when you run the game.
 
 There is no game over detection, and I will make some improvements...
 
@@ -46,8 +46,7 @@ and on Ubuntu 14.04
 
 ## Playing
 
-Press any of the arrow keys **twice** to make a move. This was the way
-I found not to have the move triggered multiple times.
+Press any of the arrow keys to make a move.
 
 Press 'q' to quit.
 Press 'n' to start a new game.
