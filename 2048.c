@@ -16,7 +16,7 @@ unsigned int high_score = 0;
 unsigned int enable_colors = 1;
 unsigned int color = 0;
 
-struct timespec sleep = {0, 125000000};
+struct timespec sleep = {0, 150000000};
 
 const char* const save_file_name = "save.game";
 
@@ -134,7 +134,7 @@ void del_tiles(void) {
         for (x = 0; x < board_size; ++x) {
             delwin(tiles[y][x]);
         }
-    }    
+    }
 }
 
 void print_board(void) {
@@ -179,14 +179,39 @@ void print_board(void) {
               high_score);
 }
 
-void move_cell(int y, int x,
-               int dy, int dx) {
-    if (((x + dx >= board_size) || (x + dx < 0)) ||
-        ((y + dy >= board_size) || (y + dy < 0))) {
+void side(int y, int x,
+          int dy, int dx,
+          int ny, int nx) {
+    if (((y < 0) || (y >= BOARD_SIZE))
+        || ((x < 0) || (x >= BOARD_SIZE))) {
         return;
     }
 
-    if (board[board_size*y + x] == 0) {
+    backward(y, x, dy, dx);
+    side(y + ny, x + nx,
+         dy, dx,
+         ny, nx);
+}
+
+void backward(int y, int x,
+             int dy, int dx) {
+    if (((y < 0) || (y >= BOARD_SIZE))
+        || ((x < 0) || (x >= BOARD_SIZE))) {
+        return;
+    }
+
+    forward(y, x, dy, dx);
+    backward(y - dy, x - dx, dy, dx);
+}
+
+void forward(int y, int x,
+             int dy, int dx) {
+    if (((y + dy < 0) || (y + dy >= BOARD_SIZE))
+        || ((x + dx < 0) || (x + dx >= BOARD_SIZE))) {
+        return;
+    }
+
+    if (board[BOARD_SIZE*y + x] == 0) {
         return;
     }
 
@@ -202,43 +227,7 @@ void move_cell(int y, int x,
         board[board_size*(y + dy) + x + dx] = board[board_size*(y) + x];
         board[board_size*(y) + x] = 0;
         change = 1;
-        move_cell(y + dy, x + dx, dy, dx);
-    }
-}
-
-void right(void) {
-    int y, x;
-    for (y = 0; y < board_size; ++y) {
-        for (x = board_size - 2; x >= 0; --x) {
-            move_cell_right(y, x);
-        }
-    }
-}
-
-void down(void) {
-    int y, x;
-    for (x = 0; x < board_size; ++x) {
-        for (y = board_size - 2; y >= 0; --y) {
-            move_cell_down(y, x);
-        }
-    }
-}
-
-void left(void) {
-    int y, x;
-    for (y = 0; y < board_size; ++y) {
-        for (x = 1; x < board_size; ++x) {
-            move_cell_left(y, x);
-        }
-    }
-}
-
-void up(void) {
-    int y, x;
-    for (x = 0; x < board_size; ++x) {
-        for (y = 1; y < board_size; ++y) {
-            move_cell_up(y, x);
-        }
+        forward(y + dy, x + dx, dy, dx);
     }
 }
 

@@ -38,21 +38,20 @@ void del_tiles(void);
 
 void print_board(void);
 
-void move_cell(int y, int x,
-	       int dy, int dx);
+void side(int y, int x,
+          int dy, int dx,
+          int ny, int nx);
 
-#define move_cell_right(y, x) move_cell(y, x, 0, 1)
-#define move_cell_down(y, x) move_cell(y, x, 1, 0)
-#define move_cell_left(y, x) move_cell(y, x, 0, -1)
-#define move_cell_up(y, x) move_cell(y, x, -1, 0)
+void backward(int y, int x,
+              int dy, int dx);
 
-void right(void);
+void forward(int y, int x,
+             int dy, int dx);
 
-void down(void);
-
-void left(void);
-
-void up(void);
+#define right() side(0, BOARD_SIZE - 2, 0, 1, 1, 0)
+#define down() side(BOARD_SIZE - 2, 0, 1, 0, 0, 1)
+#define left() side(0, 1, 0, -1, 1, 0)
+#define up() side(1, 0, -1, 0, 0, 1)
 
 int refresh_free_tiles(void);
 
