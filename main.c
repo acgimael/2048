@@ -26,9 +26,15 @@ int main() {
  start:
     while (1) {
         if (change) {
-            insert_random_tile();
             change = 0;
+            insert_random_tile();
+        } else {
+            int count = refresh_free_tiles();
+            if (count == 0) {
+                is_game_over();
+            }
         }
+
         print_board();
         wmove(stdscr, 0, 0);
         refresh();
@@ -40,16 +46,16 @@ int main() {
         case 'q':
             goto end;
         case KEY_RIGHT:
-            right();
+            right(1);
             break;
         case KEY_DOWN:
-            down();
+            down(1);
             break;
         case KEY_LEFT:
-            left();
+            left(1);
             break;
         case KEY_UP:
-            up();
+            up(1);
             break;
         }
         input = 0;

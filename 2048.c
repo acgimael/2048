@@ -16,6 +16,8 @@ unsigned int high_score = 0;
 unsigned int enable_colors = 1;
 unsigned int color = 0;
 
+unsigned int game_over = 0;
+
 struct timespec sleep = {0, 150000000};
 
 const char* const save_file_name = "save.game";
@@ -117,6 +119,16 @@ int load_game(void) {
     return loaded;
 }
 
+void is_game_over() {
+    right(0);
+    down(0);
+    left(0);
+    up(0);
+    if (change == 0) {
+        game_over = 1;
+    }
+}
+
 void init_tiles(void) {
     int y, x;
     for (y = 0; y < board_size; ++y) {
@@ -174,12 +186,13 @@ void print_board(void) {
         rev = ~rev;
     }
     mvwprintw(stdscr,
-              (TILE_SIZE/2)*board_size + 1, 0,
-              "High-score: %u",
-              high_score);
+              (TILE_SIZE/2)*BOARD_SIZE + 1, 0,
+              "High-score: %u%s",
+              high_score, (game_over)?" [GAME OVER]":"");
 }
 
-void side(int y, int x,
+void side(int live,
+          int y, int x,
           int dy, int dx,
           int ny, int nx) {
     if (((y < 0) || (y >= BOARD_SIZE))
@@ -187,24 +200,28 @@ void side(int y, int x,
         return;
     }
 
-    backward(y, x, dy, dx);
-    side(y + ny, x + nx,
+    backward(live,
+             y, x, dy, dx);
+    side(live,
+         y + ny, x + nx,
          dy, dx,
          ny, nx);
 }
 
-void backward(int y, int x,
+void backward(int live,
+              int y, int x,
              int dy, int dx) {
     if (((y < 0) || (y >= BOARD_SIZE))
         || ((x < 0) || (x >= BOARD_SIZE))) {
         return;
     }
 
-    forward(y, x, dy, dx);
-    backward(y - dy, x - dx, dy, dx);
+    forward(live, y, x, dy, dx);
+    backward(live, y - dy, x - dx, dy, dx);
 }
 
-void forward(int y, int x,
+void forward(int live,
+             int y, int x,
              int dy, int dx) {
     if (((y + dy < 0) || (y + dy >= BOARD_SIZE))
         || ((x + dx < 0) || (x + dx >= BOARD_SIZE))) {
@@ -216,25 +233,27 @@ void forward(int y, int x,
     }
 
     if (board[board_size*y + x] == board[board_size*(y + dy) + x + dx]) {
-        ++board[board_size*(y + dy) + x + dx];
-        board[board_size*(y) + x] = 0;
-        score += (1 << board[board_size*(y + dy) + x + dx]);
-        if (score > high_score) {
-            high_score = score;
+        if (live) {
+            ++board[board_size*(y + dy) + x + dx];
+            board[board_size*(y) + x] = 0;
+            score += (1 << board[board_size*(y + dy) + x + dx]);
+            if (score > high_score) {
+                high_score = score;
+            }
         }
         change = 1;
     } else if (board[board_size*(y + dy) + x + dx] == 0) {
         board[board_size*(y + dy) + x + dx] = board[board_size*(y) + x];
         board[board_size*(y) + x] = 0;
         change = 1;
-        forward(y + dy, x + dx, dy, dx);
+        forward(live, y + dy, x + dx, dy, dx);
     }
 }
 
 int refresh_free_tiles(void) {
     int i;
     int count = 0;
-    for (i = 0; i < board_size*board_size; ++i) {
+    for (i = 0; i < BOARD_SIZE*BOARD_SIZE; ++i) {
         if (board[i] == 0) {
             free_tiles[count] = i;
             ++count;
@@ -253,6 +272,7 @@ void insert_random_tile(void) {
 }
 
 void new_game(void) {
+    game_over = 0;
     change = 0;
     score = 0;
     memset(board, 0, (size_t)board_size*board_size);
