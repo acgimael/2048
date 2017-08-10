@@ -46,7 +46,7 @@ and on Ubuntu 14.04
 
 Press any of the arrow keys to make a move.
 
-Press 'q' to quit.
+Press 'q' to quit.  
 Press 'n' to start a new game.
 
 ## Design decisions
