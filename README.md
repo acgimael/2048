@@ -6,8 +6,6 @@ Mostly wrote this to learn how to use ncurses
 
 It saves your game when you quit, loads when you run the game.
 
-There is no game over detection, and I will make some improvements...
-
 ## Installing
 
 You may have to install ncurses:
