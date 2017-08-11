@@ -120,13 +120,16 @@ int load_game(void) {
 }
 
 void is_game_over() {
-    right(0);
-    down(0);
-    left(0);
-    up(0);
-    if (change == 0) {
-        game_over = 1;
+    int y, x;
+    for (y = 0; y < BOARD_SIZE; ++y) {
+        for (x = 0; x < BOARD_SIZE; ++x) {
+            /*right*/ if ((x + 1 < BOARD_SIZE) && board[BOARD_SIZE*y + x] == board[BOARD_SIZE*y + (x + 1)]) return;
+            /*down */ if ((y + 1 < BOARD_SIZE) && board[BOARD_SIZE*y + x] == board[BOARD_SIZE*(y + 1) + x]) return;
+            /*left */ if ((x - 1 >= 0        ) && board[BOARD_SIZE*y + x] == board[BOARD_SIZE*y + (x - 1)]) return;
+            /*up   */ if ((y - 1 >= 0        ) && board[BOARD_SIZE*y + x] == board[BOARD_SIZE*(y - 1) + x]) return;
+        }
     }
+    game_over = 1;
 }
 
 void init_tiles(void) {
@@ -191,62 +194,116 @@ void print_board(void) {
               high_score, (game_over)?" [GAME OVER]":"");
 }
 
-void side(int live,
-          int y, int x,
-          int dy, int dx,
-          int ny, int nx) {
-    if (((y < 0) || (y >= BOARD_SIZE))
-        || ((x < 0) || (x >= BOARD_SIZE))) {
+void move_tile(int y, int x,
+               int dy, int dx) {
+    if (board[board_size*y + x] == 0) {
         return;
     }
 
-    backward(live,
-             y, x, dy, dx);
-    side(live,
-         y + ny, x + nx,
-         dy, dx,
-         ny, nx);
+    if (((x + dx >= BOARD_SIZE) || (x + dx < 0))
+        || ((y + dy >= BOARD_SIZE) || (y + dy < 0))) {
+        return;
+    }
+
+    if (board[board_size*(y + dy) + (x + dx)] == 0) {
+        change = 1;
+        board[board_size*(y + dy) + (x + dx)] = board[board_size*y + x];
+        board[board_size*y + x] = 0;
+        move_tile(y + dy, x + dx, dy, dx);
+    }
 }
 
-void backward(int live,
-              int y, int x,
-             int dy, int dx) {
-    if (((y < 0) || (y >= BOARD_SIZE))
-        || ((x < 0) || (x >= BOARD_SIZE))) {
-        return;
-    }
-
-    forward(live, y, x, dy, dx);
-    backward(live, y - dy, x - dx, dy, dx);
-}
-
-void forward(int live,
-             int y, int x,
-             int dy, int dx) {
-    if (((y + dy < 0) || (y + dy >= BOARD_SIZE))
-        || ((x + dx < 0) || (x + dx >= BOARD_SIZE))) {
-        return;
-    }
-
-    if (board[BOARD_SIZE*y + x] == 0) {
-        return;
-    }
-
-    if (board[board_size*y + x] == board[board_size*(y + dy) + x + dx]) {
-        if (live) {
-            ++board[board_size*(y + dy) + x + dx];
-            board[board_size*(y) + x] = 0;
-            score += (1 << board[board_size*(y + dy) + x + dx]);
-            if (score > high_score) {
-                high_score = score;
-            }
+void right(void) {
+    int y, x;
+    for (x = BOARD_SIZE - 2; x >= 0; --x) {
+        for (y = 0; y < BOARD_SIZE; ++y) {
+            move_tile(y, x, 0, 1);
         }
+    }
+}
+
+void merge_right(void) {
+    int y, x;
+    for (x = BOARD_SIZE - 2; x >= 0; --x) {
+        for (y = 0; y < BOARD_SIZE; ++y) {
+            merge_tiles(y, x, 0, 1);
+        }
+    }
+}
+
+void down(void) {
+    int y, x;
+    for (y = BOARD_SIZE - 2; y >= 0; --y) {
+        for (x = 0; x < BOARD_SIZE; ++x) {
+            move_tile(y, x, 1, 0);
+        }
+    }
+}
+
+void merge_down(void) {
+    int y, x;
+    for (y = BOARD_SIZE - 2; y >= 0; --y) {
+        for (x = 0; x < BOARD_SIZE; ++x) {
+            merge_tiles(y, x, 1, 0);
+        }
+    }
+}
+
+void left(void) {
+    int y, x;
+    for (x = 1; x < BOARD_SIZE; ++x) {
+        for (y = 0; y < BOARD_SIZE; ++y) {
+            move_tile(y, x, 0, -1);
+        }
+    }
+}
+
+void merge_left(void) {
+    int y, x;
+    for (x = 1; x < BOARD_SIZE; ++x) {
+        for (y = 0; y < BOARD_SIZE; ++y) {
+            merge_tiles(y, x, 0, -1);
+        }
+    }
+}
+
+void up(void) {
+    int y, x;
+    for (y = 1; y < BOARD_SIZE; ++y) {
+        for (x = 0; x < BOARD_SIZE; ++x) {
+            move_tile(y, x, -1, 0);
+        }
+    }
+}
+
+void merge_up(void) {
+    int y, x;
+    for (y = 1; y < BOARD_SIZE; ++y) {
+        for (x = 0; x < BOARD_SIZE; ++x) {
+            merge_tiles(y, x, -1, 0);
+        }
+    }
+}
+
+void merge_tiles(int y, int x,
+                 int dy, int dx) {
+    if (board[board_size*y + x] == 0) {
+        return;
+    }
+
+    if (((x + dx >= BOARD_SIZE) || (x + dx < 0))
+        || ((y + dy >= BOARD_SIZE) || (y + dy < 0))) {
+        return;
+    }
+
+    if (board[board_size*(y + dy) + (x + dx)] == board[board_size*y + x]) {
         change = 1;
-    } else if (board[board_size*(y + dy) + x + dx] == 0) {
-        board[board_size*(y + dy) + x + dx] = board[board_size*(y) + x];
-        board[board_size*(y) + x] = 0;
-        change = 1;
-        forward(live, y + dy, x + dx, dy, dx);
+        ++board[board_size*(y + dy) + (x + dx)];
+        score += (1 << board[board_size*(y + dy) + (x + dx)]);
+        board[board_size*y + x] = 0;
+        if (score > high_score) {
+            high_score = score;
+        }
     }
 }
 

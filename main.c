@@ -1,8 +1,10 @@
 #include <stdlib.h>
+#include <locale.h>
 
 #include "2048.h"
 
 int main() {
+    (void)setlocale(LC_ALL, "");
     (void)initscr();
 
     if (enable_colors && has_colors()) {
@@ -13,6 +15,8 @@ int main() {
 
     cbreak();
     noecho();
+    nonl();
+    intrflush(stdscr, FALSE);
     keypad(stdscr, TRUE);
 
     init_tiles();
@@ -39,6 +43,9 @@ int main() {
         wmove(stdscr, 0, 0);
         refresh();
         input = getch();
+
+        (void)flushinp();
+
         switch (input) {
         case 'n':
             new_game();
@@ -46,16 +53,24 @@ int main() {
         case 'q':
             goto end;
         case KEY_RIGHT:
-            right(1);
+            right();
+            merge_right();
+            right();
             break;
         case KEY_DOWN:
-            down(1);
+            down();
+            merge_down();
+            down();
             break;
         case KEY_LEFT:
-            left(1);
+            left();
+            merge_left();
+            left();
             break;
         case KEY_UP:
-            up(1);
+            up();
+            merge_up();
+            up();
             break;
         }
         input = 0;

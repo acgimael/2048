@@ -41,23 +41,27 @@ void del_tiles(void);
 
 void print_board(void);
 
-void side(int live,
-          int y, int x,
-          int dy, int dx,
-          int ny, int nx);
+void move_tile(int y, int x,
+               int dy, int dx);
 
-void backward(int live,
-              int y, int x,
-              int dy, int dx);
+void right(void);
 
-void forward(int live,
-             int y, int x,
-             int dy, int dx);
+void down(void);
 
-#define right(live) side(live, 0, BOARD_SIZE - 2, 0, 1, 1, 0)
-#define down(live) side(live, BOARD_SIZE - 2, 0, 1, 0, 0, 1)
-#define left(live) side(live, 0, 1, 0, -1, 1, 0)
-#define up(live) side(live, 1, 0, -1, 0, 0, 1)
+void left(void);
+
+void up(void);
+
+void merge_right(void);
+
+void merge_down(void);
+
+void merge_left(void);
+
+void merge_up(void);
+
+void merge_tiles(int y, int x,
+                 int dy, int dx);
 
 int refresh_free_tiles(void);
 
