@@ -4,6 +4,7 @@
 #include <string.h>
 
 #define ARR_LEN(arr) (sizeof((arr))/sizeof((arr)[0]))
+#define BOARD(y, x) board[BOARD_SIZE*(y) + (x)]
 
 const int board_size = BOARD_SIZE;
 
@@ -123,10 +124,10 @@ void is_game_over() {
     int y, x;
     for (y = 0; y < BOARD_SIZE; ++y) {
         for (x = 0; x < BOARD_SIZE; ++x) {
-            /*right*/ if ((x + 1 < BOARD_SIZE) && board[BOARD_SIZE*y + x] == board[BOARD_SIZE*y + (x + 1)]) return;
-            /*down */ if ((y + 1 < BOARD_SIZE) && board[BOARD_SIZE*y + x] == board[BOARD_SIZE*(y + 1) + x]) return;
-            /*left */ if ((x - 1 >= 0        ) && board[BOARD_SIZE*y + x] == board[BOARD_SIZE*y + (x - 1)]) return;
-            /*up   */ if ((y - 1 >= 0        ) && board[BOARD_SIZE*y + x] == board[BOARD_SIZE*(y - 1) + x]) return;
+            /*right*/ if ((x + 1 < BOARD_SIZE) && BOARD(y, x) == BOARD(y, x + 1)) return;
+            /*down */ if ((y + 1 < BOARD_SIZE) && BOARD(y, x) == BOARD(y + 1, x)) return;
+            /*left */ if ((x - 1 >= 0) && BOARD(y, x) == BOARD(y, x - 1)) return;
+            /*up   */ if ((y - 1 >= 0) && BOARD(y, x) == BOARD(y - 1, x)) return;
         }
     }
     game_over = 1;
@@ -160,28 +161,25 @@ void print_board(void) {
     for (y = 0; y < board_size; ++y) {
         for (x = 0; x < board_size; ++x) {
             if (color) {
-                if (board[board_size*y + x] <
-                    ARR_LEN(relation)) {
+                if (BOARD(y, x) < ARR_LEN(relation)) {
                     wbkgd(tiles[y][x], ' ' |
-                          COLOR_PAIR(board[(size_t)board_size*y + x]));
+                          COLOR_PAIR(BOARD(y, x)));
                 } else {
                     wbkgd(tiles[y][x], ' ' | COLOR_PAIR(0));
                 }
             } else {
                 wbkgd(tiles[y][x], ' ' | ((rev)?A_REVERSE:0));
             }
-            if (board[board_size*y + x] <
-                ARR_LEN(relation)) {
-
+            if (BOARD(y, x) < ARR_LEN(relation)) {
                 mvwprintw(tiles[y][x],
                           TILE_SIZE/4, 1,
                           "%7s",
-                          relation[(size_t)board[board_size*y + x]]);
+                          relation[(size_t)BOARD(y, x)]);
             } else {
                 mvwprintw(tiles[y][x],
                           TILE_SIZE/4, 1,
                           "2^%d",
-                          board[board_size*y + x]);
+                          BOARD(y, x));
             }
             wrefresh(tiles[y][x]);
             rev = ~rev;
@@ -196,7 +194,7 @@ void print_board(void) {
 
 void move_tile(int y, int x,
                int dy, int dx) {
-    if (board[board_size*y + x] == 0) {
+    if (BOARD(y, x) == 0) {
         return;
     }
 
@@ -205,10 +203,10 @@ void move_tile(int y, int x,
         return;
     }
 
-    if (board[board_size*(y + dy) + (x + dx)] == 0) {
+    if (BOARD(y + dy, x + dx) == 0) {
         change = 1;
-        board[board_size*(y + dy) + (x + dx)] = board[board_size*y + x];
-        board[board_size*y + x] = 0;
+        BOARD(y + dy, x + dx) = BOARD(y, x);
+        BOARD(y, x) = 0;
         move_tile(y + dy, x + dx, dy, dx);
     }
 }
@@ -287,7 +285,7 @@ void merge_up(void) {
 
 void merge_tiles(int y, int x,
                  int dy, int dx) {
-    if (board[board_size*y + x] == 0) {
+    if (BOARD(y, x) == 0) {
         return;
     }
 
@@ -296,11 +294,11 @@ void merge_tiles(int y, int x,
         return;
     }
 
-    if (board[board_size*(y + dy) + (x + dx)] == board[board_size*y + x]) {
+    if (BOARD(y + dy, x + dx) == BOARD(y, x)) {
         change = 1;
-        ++board[board_size*(y + dy) + (x + dx)];
-        score += (1 << board[board_size*(y + dy) + (x + dx)]);
-        board[board_size*y + x] = 0;
+        ++BOARD(y + dy, x + dx);
+        score += (1 << BOARD(y + dy, x + dx));
+        BOARD(y, x) = 0;
         if (score > high_score) {
             high_score = score;
         }
