@@ -20,6 +20,7 @@ unsigned int color = 0;
 unsigned int game_over = 0;
 
 struct timespec sleep = {0, 150000000};
+struct timespec anim8 = {0,  37500000};
 
 const char* const save_file_name = "save.game";
 
@@ -126,8 +127,6 @@ void is_game_over() {
         for (x = 0; x < BOARD_SIZE; ++x) {
             /*right*/ if ((x + 1 < BOARD_SIZE) && BOARD(y, x) == BOARD(y, x + 1)) return;
             /*down */ if ((y + 1 < BOARD_SIZE) && BOARD(y, x) == BOARD(y + 1, x)) return;
-            /*left */ if ((x - 1 >= 0) && BOARD(y, x) == BOARD(y, x - 1)) return;
-            /*up   */ if ((y - 1 >= 0) && BOARD(y, x) == BOARD(y - 1, x)) return;
         }
     }
     game_over = 1;
@@ -207,6 +206,12 @@ void move_tile(int y, int x,
         change = 1;
         BOARD(y + dy, x + dx) = BOARD(y, x);
         BOARD(y, x) = 0;
+
+        print_board();
+        refresh();
+
+        nanosleep(&anim8, NULL);
+
         move_tile(y + dy, x + dx, dy, dx);
     }
 }
@@ -302,6 +307,12 @@ void merge_tiles(int y, int x,
         if (score > high_score) {
             high_score = score;
         }
+
+
+        print_board();
+        refresh();
+
+        nanosleep(&anim8, NULL);
     }
 }
 

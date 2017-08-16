@@ -18,6 +18,7 @@ int main() {
     nonl();
     intrflush(stdscr, FALSE);
     keypad(stdscr, TRUE);
+    curs_set(0);
 
     init_tiles();
 
@@ -40,7 +41,6 @@ int main() {
         }
 
         print_board();
-        wmove(stdscr, 0, 0);
         refresh();
         input = getch();
 
