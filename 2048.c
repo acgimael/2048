@@ -6,6 +6,10 @@
 #define ARR_LEN(arr) (sizeof((arr))/sizeof((arr)[0]))
 #define BOARD(y, x) board[BOARD_SIZE*(y) + (x)]
 
+static int moved = 0;
+
+inline static void board_step(direction dir);
+
 const int board_size = BOARD_SIZE;
 
 const char* const title = "2048";
@@ -125,8 +129,10 @@ void is_game_over() {
     int y, x;
     for (y = 0; y < BOARD_SIZE; ++y) {
         for (x = 0; x < BOARD_SIZE; ++x) {
-            /*right*/ if ((x + 1 < BOARD_SIZE) && BOARD(y, x) == BOARD(y, x + 1)) return;
-            /*down */ if ((y + 1 < BOARD_SIZE) && BOARD(y, x) == BOARD(y + 1, x)) return;
+            if (((x + 1 < BOARD_SIZE) && BOARD(y, x) == BOARD(y, x + 1)) ||
+                ((y + 1 < BOARD_SIZE) && BOARD(y, x) == BOARD(y + 1, x))) {
+                return;
+            }
         }
     }
     game_over = 1;
@@ -172,7 +178,8 @@ void print_board(void) {
             if (BOARD(y, x) < ARR_LEN(relation)) {
                 mvwprintw(tiles[y][x],
                           TILE_SIZE/4, 1,
-                          "%7s",
+                          "%*s",
+                          TILE_SIZE - 2,
                           relation[(size_t)BOARD(y, x)]);
             } else {
                 mvwprintw(tiles[y][x],
@@ -189,6 +196,7 @@ void print_board(void) {
               (TILE_SIZE/2)*BOARD_SIZE + 1, 0,
               "High-score: %u%s",
               high_score, (game_over)?" [GAME OVER]":"");
+    refresh();
 }
 
 void move_tile(int y, int x,
@@ -204,46 +212,27 @@ void move_tile(int y, int x,
 
     if (BOARD(y + dy, x + dx) == 0) {
         change = 1;
+        moved = 1;
         BOARD(y + dy, x + dx) = BOARD(y, x);
         BOARD(y, x) = 0;
-
-        print_board();
-        refresh();
-
-        nanosleep(&anim8, NULL);
-
-        move_tile(y + dy, x + dx, dy, dx);
     }
 }
 
-void right(void) {
-    int y, x;
-    for (x = BOARD_SIZE - 2; x >= 0; --x) {
-        for (y = 0; y < BOARD_SIZE; ++y) {
-            move_tile(y, x, 0, 1);
-        }
-    }
-}
-
-void merge_right(void) {
+inline static void merge_right(void) {
     int y, x;
     for (x = BOARD_SIZE - 2; x >= 0; --x) {
         for (y = 0; y < BOARD_SIZE; ++y) {
             merge_tiles(y, x, 0, 1);
         }
+        print_board();
+        refresh();
+
+        nanosleep(&anim8, NULL);
     }
 }
 
-void down(void) {
-    int y, x;
-    for (y = BOARD_SIZE - 2; y >= 0; --y) {
-        for (x = 0; x < BOARD_SIZE; ++x) {
-            move_tile(y, x, 1, 0);
-        }
-    }
-}
 
-void merge_down(void) {
+inline static void merge_down(void) {
     int y, x;
     for (y = BOARD_SIZE - 2; y >= 0; --y) {
         for (x = 0; x < BOARD_SIZE; ++x) {
@@ -252,16 +241,7 @@ void merge_down(void) {
     }
 }
 
-void left(void) {
-    int y, x;
-    for (x = 1; x < BOARD_SIZE; ++x) {
-        for (y = 0; y < BOARD_SIZE; ++y) {
-            move_tile(y, x, 0, -1);
-        }
-    }
-}
-
-void merge_left(void) {
+inline static void merge_left(void) {
     int y, x;
     for (x = 1; x < BOARD_SIZE; ++x) {
         for (y = 0; y < BOARD_SIZE; ++y) {
@@ -270,21 +250,78 @@ void merge_left(void) {
     }
 }
 
-void up(void) {
-    int y, x;
-    for (y = 1; y < BOARD_SIZE; ++y) {
-        for (x = 0; x < BOARD_SIZE; ++x) {
-            move_tile(y, x, -1, 0);
-        }
-    }
-}
-
-void merge_up(void) {
+inline static void merge_up(void) {
     int y, x;
     for (y = 1; y < BOARD_SIZE; ++y) {
         for (x = 0; x < BOARD_SIZE; ++x) {
             merge_tiles(y, x, -1, 0);
         }
+    }
+}
+
+void board_move(direction dir) {
+    switch(dir) {
+    case right:
+        board_step(right);
+        merge_right();
+        board_step(right);
+        break;
+    case down:
+        board_step(down);
+        merge_down();
+        board_step(down);        
+        break;
+    case left:
+        board_step(left);
+        merge_left();
+        board_step(left);
+        break;
+    case up:
+        board_step(up);
+        merge_up();
+        board_step(up);
+        break;
+    }
+}
+
+inline static void board_step(direction dir) {
+    int y, x;
+    switch(dir) {
+    case right:
+        for (x = BOARD_SIZE - 2; x >= 0; --x) {
+            for (y = 0; y < BOARD_SIZE; ++y) {
+                move_tile(y, x, 0, 1);
+            }
+        }
+        break;
+    case down:
+        for (y = BOARD_SIZE - 2; y >= 0; --y) {
+            for (x = 0; x < BOARD_SIZE; ++x) {
+                move_tile(y, x, 1, 0);
+            }
+        }
+        break;
+    case left:
+        for (x = 1; x < BOARD_SIZE; ++x) {
+            for (y = 0; y < BOARD_SIZE; ++y) {
+                move_tile(y, x, 0, -1);
+            }
+        }
+        break;
+    case up:
+        for (y = 1; y < BOARD_SIZE; ++y) {
+            for (x = 0; x < BOARD_SIZE; ++x) {
+                move_tile(y, x, -1, 0);
+            }
+        }
+        break;
+    }
+    print_board();
+
+    nanosleep(&anim8, NULL);
+    if (moved) {
+        moved = 0;
+        board_step(dir);
     }
 }
 

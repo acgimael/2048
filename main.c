@@ -41,7 +41,6 @@ int main() {
         }
 
         print_board();
-        refresh();
         input = getch();
 
         (void)flushinp();
@@ -53,24 +52,16 @@ int main() {
         case 'q':
             goto end;
         case KEY_RIGHT:
-            right();
-            merge_right();
-            right();
+            board_move(right);
             break;
         case KEY_DOWN:
-            down();
-            merge_down();
-            down();
+            board_move(down);
             break;
         case KEY_LEFT:
-            left();
-            merge_left();
-            left();
+            board_move(left);
             break;
         case KEY_UP:
-            up();
-            merge_up();
-            up();
+            board_move(up);
             break;
         }
         input = 0;

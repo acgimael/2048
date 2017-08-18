@@ -29,6 +29,10 @@ extern int free_tiles[];
 
 extern WINDOW* tiles[BOARD_SIZE][BOARD_SIZE];
 
+typedef enum direction {
+    right, down, left, up
+} direction;
+
 void save_game(void);
 
 int load_game(void);
@@ -44,21 +48,7 @@ void print_board(void);
 void move_tile(int y, int x,
                int dy, int dx);
 
-void right(void);
-
-void down(void);
-
-void left(void);
-
-void up(void);
-
-void merge_right(void);
-
-void merge_down(void);
-
-void merge_left(void);
-
-void merge_up(void);
+void board_move(direction dir);
 
 void merge_tiles(int y, int x,
                  int dy, int dx);
