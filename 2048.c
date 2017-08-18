@@ -218,44 +218,37 @@ void move_tile(int y, int x,
     }
 }
 
-inline static void merge_right(void) {
+inline static void merge(direction dir) {
     int y, x;
-    for (x = BOARD_SIZE - 2; x >= 0; --x) {
-        for (y = 0; y < BOARD_SIZE; ++y) {
-            merge_tiles(y, x, 0, 1);
+    switch (dir) {
+    case right:
+        for (x = BOARD_SIZE - 2; x >= 0; --x) {
+            for (y = 0; y < BOARD_SIZE; ++y) {
+                merge_tiles(y, x, 0, 1);
+            }
         }
-        print_board();
-        refresh();
-
-        nanosleep(&anim8, NULL);
-    }
-}
-
-
-inline static void merge_down(void) {
-    int y, x;
-    for (y = BOARD_SIZE - 2; y >= 0; --y) {
-        for (x = 0; x < BOARD_SIZE; ++x) {
-            merge_tiles(y, x, 1, 0);
+        break;
+    case down:
+        for (y = BOARD_SIZE - 2; y >= 0; --y) {
+            for (x = 0; x < BOARD_SIZE; ++x) {
+                merge_tiles(y, x, 1, 0);
+            }
         }
-    }
-}
-
-inline static void merge_left(void) {
-    int y, x;
-    for (x = 1; x < BOARD_SIZE; ++x) {
-        for (y = 0; y < BOARD_SIZE; ++y) {
-            merge_tiles(y, x, 0, -1);
+        break;
+    case left:
+        for (x = 1; x < BOARD_SIZE; ++x) {
+            for (y = 0; y < BOARD_SIZE; ++y) {
+                merge_tiles(y, x, 0, -1);
+            }
         }
-    }
-}
-
-inline static void merge_up(void) {
-    int y, x;
-    for (y = 1; y < BOARD_SIZE; ++y) {
-        for (x = 0; x < BOARD_SIZE; ++x) {
-            merge_tiles(y, x, -1, 0);
+        break;
+    case up:
+        for (y = 1; y < BOARD_SIZE; ++y) {
+            for (x = 0; x < BOARD_SIZE; ++x) {
+                merge_tiles(y, x, -1, 0);
+            }
         }
+        break;
     }
 }
 
@@ -263,22 +256,22 @@ void board_move(direction dir) {
     switch(dir) {
     case right:
         board_step(right);
-        merge_right();
+        merge(right);
         board_step(right);
         break;
     case down:
         board_step(down);
-        merge_down();
+        merge(down);
         board_step(down);        
         break;
     case left:
         board_step(left);
-        merge_left();
+        merge(left);
         board_step(left);
         break;
     case up:
         board_step(up);
-        merge_up();
+        merge(up);
         board_step(up);
         break;
     }
@@ -344,12 +337,6 @@ void merge_tiles(int y, int x,
         if (score > high_score) {
             high_score = score;
         }
-
-
-        print_board();
-        refresh();
-
-        nanosleep(&anim8, NULL);
     }
 }
 
