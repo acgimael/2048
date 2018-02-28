@@ -33,11 +33,11 @@ int main() {
         if (change) {
             change = 0;
             insert_random_tile();
-        } else {
-            int count = refresh_free_tiles();
-            if (count == 0) {
-                is_game_over();
-            }
+        }
+
+        int count = refresh_free_tiles();
+        if (count == 0) {
+            is_game_over();
         }
 
         print_board();

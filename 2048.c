@@ -262,7 +262,7 @@ void board_move(direction dir) {
     case down:
         board_step(down);
         merge(down);
-        board_step(down);        
+        board_step(down);
         break;
     case left:
         board_step(left);
