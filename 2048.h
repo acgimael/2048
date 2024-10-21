@@ -3,12 +3,13 @@
 
 #include <ncurses.h>
 #include <time.h>
+#include <stdint.h>
 
 #define BOARD_SIZE 4
 
 #define TILE_SIZE 9
 
-extern const int board_size;
+extern const uint8_t board_size;
 
 extern const char* const title;
 extern unsigned int score;

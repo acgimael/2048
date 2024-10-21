@@ -10,7 +10,7 @@ static int moved = 0;
 
 inline static void board_step(direction dir);
 
-const int board_size = BOARD_SIZE;
+const uint8_t board_size = BOARD_SIZE;
 
 const char* const title = "2048";
 
