@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <arpa/inet.h>
+
 #define ARR_LEN(arr) (sizeof((arr))/sizeof((arr)[0]))
 #define BOARD(y, x) board[BOARD_SIZE*(y) + (x)]
 
@@ -14,14 +16,14 @@ const uint8_t board_size = BOARD_SIZE;
 
 const char* const title = "2048";
 
-unsigned int score = 0;
-unsigned int change = 0;
-unsigned int high_score = 0;
+uint32_t score = 0;
+uint32_t high_score = 0;
+uint8_t change = 0;
 
-unsigned int enable_colors = 1;
-unsigned int color = 0;
+uint8_t enable_colors = 1;
+uint8_t color = 0;
 
-unsigned int game_over = 0;
+uint8_t game_over = 0;
 
 struct timespec sleep = {0, 150000000};
 struct timespec anim8 = {0,  37500000};
@@ -67,12 +69,14 @@ void save_game(void) {
                   "to the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
-        if (fwrite(&score, sizeof(score), 1, fp) != 1) {
+        uint32_t score_n = htonl(score);
+        if (fwrite(&score_n, sizeof(score_n), 1, fp) != 1) {
             fputs("Could not write the score "
                   "to the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
-        if (fwrite(&high_score, sizeof(high_score), 1, fp) != 1) {
+        uint32_t high_score_n = htonl(high_score);
+        if (fwrite(&high_score_n, sizeof(high_score_n), 1, fp) != 1) {
             fputs("Could not write the high score "
                   "to the save game file\n", stderr);
             exit(EXIT_FAILURE);
@@ -91,8 +95,8 @@ int load_game(void) {
     int loaded = 0;
     FILE* fp = fopen(save_file_name, "rb");
     if (fp) {
-        int read_board_size = 0;
-        if (fread(&read_board_size, sizeof(board_size), 1, fp) != 1) {
+        uint8_t read_board_size = 0;
+        if (fread(&read_board_size, sizeof(read_board_size), 1, fp) != 1) {
             fputs("Could not read the board size "
                   "from the save game file\n", stderr);
             exit(EXIT_FAILURE);
@@ -107,11 +111,17 @@ int load_game(void) {
             fputs("Could not read the score "
                   "from the save game file\n", stderr);
             exit(EXIT_FAILURE);
+        } else {
+            /* convert score to host order */
+            score = ntohl(score);
         }
         if (fread(&high_score, sizeof(high_score), 1, fp) != 1) {
             fputs("Could not read the high score "
                   "from the save game file\n", stderr);
             exit(EXIT_FAILURE);
+        } else {
+            /* convert high score to host order */
+            high_score = ntohl(high_score);
         }
         if (fread(board, sizeof(*board), board_size*board_size, fp) !=
             BOARD_SIZE*BOARD_SIZE) {

@@ -12,12 +12,12 @@
 extern const uint8_t board_size;
 
 extern const char* const title;
-extern unsigned int score;
-extern unsigned int change;
-extern unsigned int high_score;
-extern unsigned int enable_colors;
-extern unsigned int color;
-extern unsigned int game_over;
+extern uint32_t high_score;
+extern uint32_t score;
+extern uint8_t change;
+extern uint8_t enable_colors;
+extern uint8_t color;
+extern uint8_t game_over;
 extern const char* const save_file_name;
 
 extern struct timespec sleep;
