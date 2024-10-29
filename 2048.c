@@ -172,7 +172,7 @@ void print_board(void) {
     int y, x;
     int rev = 0;
     (void)mvwaddstr(stdscr, 0, 1, title);
-    (void)mvwprintw(stdscr, 0, 2*TILE_SIZE, "score: %d", score);
+    (void)mvwprintw(stdscr, 0, 2*TILE_SIZE, "High-score: %d", high_score);
     for (y = 0; y < board_size; ++y) {
         for (x = 0; x < board_size; ++x) {
             if (color) {
@@ -204,8 +204,8 @@ void print_board(void) {
     }
     mvwprintw(stdscr,
               (TILE_SIZE/2)*BOARD_SIZE + 1, 0,
-              "High-score: %u%s",
-              high_score, (game_over)?" [GAME OVER]":"");
+              "Score: %u%s",
+              score, (game_over)?" [GAME OVER]":"");
     refresh();
 }
 
