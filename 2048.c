@@ -174,6 +174,7 @@ void del_tiles(void) {
 void print_board(void) {
     int y, x;
     int rev = 0;
+    touchwin(stdscr);
     (void)mvwaddstr(stdscr, 0, 1, title);
     (void)mvwprintw(stdscr, 0, 2*TILE_SIZE, "High-score: %d", high_score);
     for (y = 0; y < board_size; ++y) {
