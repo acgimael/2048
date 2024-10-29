@@ -8,6 +8,8 @@
 #define ARR_LEN(arr) (sizeof((arr))/sizeof((arr)[0]))
 #define BOARD(y, x) board[BOARD_SIZE*(y) + (x)]
 
+#define MOVE_SCORE_BUFSIZ 20
+
 static int moved = 0;
 
 inline static void board_step(direction dir);
@@ -17,6 +19,7 @@ const uint8_t board_size = BOARD_SIZE;
 const char* const title = "2048";
 
 uint32_t score = 0;
+uint32_t move_score = 0;
 uint32_t high_score = 0;
 uint8_t change = 0;
 
@@ -202,10 +205,15 @@ void print_board(void) {
         }
         rev = ~rev;
     }
+    char move_score_str[MOVE_SCORE_BUFSIZ] = "";
+    snprintf(move_score_str, MOVE_SCORE_BUFSIZ, "(+%u)", move_score);
     mvwprintw(stdscr,
               (TILE_SIZE/2)*BOARD_SIZE + 1, 0,
-              "Score: %u%s",
-              score, (game_over)?" [GAME OVER]":"");
+              "Score: %u %s%s          ",
+              score,
+              (move_score)?move_score_str:"     ",
+              (game_over)?" [GAME OVER]":""
+            );
     refresh();
 }
 
@@ -263,6 +271,7 @@ inline static void merge(direction dir) {
 }
 
 void board_move(direction dir) {
+    move_score = 0;
     switch(dir) {
     case right:
         board_step(right);
@@ -342,7 +351,8 @@ void merge_tiles(int y, int x,
     if (BOARD(y + dy, x + dx) == BOARD(y, x)) {
         change = 1;
         ++BOARD(y + dy, x + dx);
-        score += (1 << BOARD(y + dy, x + dx));
+        move_score += (1 << BOARD(y + dy, x + dx));
+        score += move_score;
         BOARD(y, x) = 0;
         if (score > high_score) {
             high_score = score;
@@ -375,6 +385,7 @@ void new_game(void) {
     game_over = 0;
     change = 0;
     score = 0;
+    move_score = 0;
     memset(board, 0, (size_t)board_size*board_size);
     insert_random_tile();
     insert_random_tile();
