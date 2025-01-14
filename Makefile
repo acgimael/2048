@@ -1,6 +1,6 @@
 LDLIBS = `pkg-config --libs ncurses`
 
-OUTPUT_OPTION = -Wall -Wextra `pkg-config --cflags ncurses`
+OUTPUT_OPTION = -march=native -mtune=native -O3 -Wall -Wextra `pkg-config --cflags ncurses`
 
 NAME = 2048
 
