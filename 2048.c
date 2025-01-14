@@ -21,6 +21,7 @@ const char* const title = "2048";
 uint32_t score = 0;
 uint32_t move_score = 0;
 uint32_t high_score = 0;
+uint32_t moves = 0;
 uint8_t change = 0;
 
 uint8_t enable_colors = 1;
@@ -72,9 +73,18 @@ void save_game(void) {
                   "to the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
+        if (score > high_score) {
+            high_score = score;
+        }
         uint32_t high_score_n = htonl(high_score);
         if (fwrite(&high_score_n, sizeof(high_score_n), 1, fp) != 1) {
             fputs("Could not write the high score "
+                  "to the save game file\n", stderr);
+            exit(EXIT_FAILURE);
+        }
+        uint32_t moves_n = htonl(moves);
+        if (fwrite(&moves_n, sizeof(moves_n), 1, fp) != 1) {
+            fputs("Could not write the number of moves "
                   "to the save game file\n", stderr);
             exit(EXIT_FAILURE);
         }
@@ -119,6 +129,14 @@ int load_game(void) {
         } else {
             /* convert high score to host order */
             high_score = ntohl(high_score);
+        }
+        if (fread(&moves, sizeof(moves), 1, fp) != 1) {
+            fputs("Could not read the number of moves "
+                  "from the save game file\n", stderr);
+            exit(EXIT_FAILURE);
+        } else {
+            /* convert high score to host order */
+            moves = ntohl(moves);
         }
         if (fread(board, sizeof(*board), board_size*board_size, fp) !=
             BOARD_SIZE*BOARD_SIZE) {
@@ -200,11 +218,26 @@ void print_board(void) {
     snprintf(move_score_str, MOVE_SCORE_BUFSIZ, "(+%u)", move_score);
     mvwprintw(stdscr,
               (TILE_SIZE/2)*BOARD_SIZE + 1, 0,
-              "Score: %u %s%s          ",
+              "Score: %u %-10s",
               score,
-              (move_score)?move_score_str:"     ",
-              (game_over)?" [GAME OVER]":""
+              (move_score)?move_score_str:""
             );
+    mvwprintw(stdscr,
+              (TILE_SIZE/2)*BOARD_SIZE + 2, 0,
+              "Moves: %u",
+              moves
+        );
+    if (game_over) {
+        mvwprintw(stdscr,
+                  (TILE_SIZE/2)*BOARD_SIZE + 3, 0,
+                  "[GAME OVER]"
+            );
+    } else {
+        mvwprintw(stdscr,
+                  (TILE_SIZE/2)*BOARD_SIZE + 3, 0,
+                  "           "
+            );
+    }
     refresh();
 }
 
@@ -345,9 +378,6 @@ void merge_tiles(int y, int x,
         move_score += (1 << BOARD(y + dy, x + dx));
         score += move_score;
         BOARD(y, x) = 0;
-        if (score > high_score) {
-            high_score = score;
-        }
     }
 }
 
@@ -356,8 +386,7 @@ int refresh_free_tiles(void) {
     int count = 0;
     for (i = 0; i < BOARD_SIZE*BOARD_SIZE; ++i) {
         if (board[i] == 0) {
-            free_tiles[count] = i;
-            ++count;
+            free_tiles[count++] = i;
         }
     }
     return count;
@@ -375,6 +404,7 @@ void insert_random_tile(void) {
 void new_game(void) {
     game_over = 0;
     change = 0;
+    moves = 0;
     score = 0;
     move_score = 0;
     memset(board, 0, (size_t)board_size*board_size);

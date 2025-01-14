@@ -13,6 +13,7 @@ extern const uint8_t board_size;
 
 extern const char* const title;
 extern uint32_t high_score;
+extern uint32_t moves;
 extern uint32_t score;
 extern uint8_t change;
 extern uint8_t enable_colors;

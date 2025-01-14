@@ -32,6 +32,7 @@ int main() {
     while (1) {
         if (change) {
             change = 0;
+            moves += 1;
             insert_random_tile();
         }
 
@@ -46,10 +47,10 @@ int main() {
         (void)flushinp();
 
         switch (input) {
-        case 'n':
+        case 'n': case 'N':
             new_game();
             goto start;
-        case 'q':
+        case 'q': case 'Q':
             goto end;
         case KEY_RIGHT:
             board_move(right);
