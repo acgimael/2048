@@ -28,7 +28,7 @@ extern unsigned char board[];
 
 extern int free_tiles[];
 
-extern WINDOW* tiles[BOARD_SIZE][BOARD_SIZE];
+extern WINDOW* tiles[BOARD_SIZE * BOARD_SIZE];
 
 typedef enum direction {
     right, down, left, up

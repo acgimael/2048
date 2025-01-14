@@ -53,10 +53,10 @@ const char* relation[] = {
     "131072"
 };
 
-unsigned char board[BOARD_SIZE*BOARD_SIZE] = {0};
-int free_tiles[BOARD_SIZE*BOARD_SIZE];
+unsigned char board[BOARD_SIZE * BOARD_SIZE] = {0};
+int free_tiles[BOARD_SIZE * BOARD_SIZE];
 
-WINDOW* tiles[BOARD_SIZE][BOARD_SIZE];
+WINDOW* tiles[BOARD_SIZE * BOARD_SIZE];
 
 void save_game(void) {
     FILE* fp = fopen(save_file_name, "wb");
@@ -146,22 +146,18 @@ void is_game_over() {
 }
 
 void init_tiles(void) {
-    int y, x;
-    for (y = 0; y < board_size; ++y) {
-        for (x = 0; x < board_size; ++x) {
-            tiles[y][x] = subwin(stdscr,
-                                 TILE_SIZE/2, TILE_SIZE,
-                                 1 + y*(TILE_SIZE/2), x*TILE_SIZE);
-        }
+    for (int i = 0; i < board_size * board_size; ++i) {
+        int x = i % board_size;
+        int y = i / board_size;
+        tiles[BOARD_SIZE * y + x] = subwin(stdscr,
+                                           TILE_SIZE/2, TILE_SIZE,
+                                           1 + y*(TILE_SIZE/2), x*TILE_SIZE);
     }
 }
 
 void del_tiles(void) {
-    int y, x;
-    for (y = 0; y < board_size; ++y) {
-        for (x = 0; x < board_size; ++x) {
-            delwin(tiles[y][x]);
-        }
+    for (int i = 0; i < board_size * board_size; ++i) {
+        delwin(tiles[i]);
     }
 }
 
@@ -175,27 +171,27 @@ void print_board(void) {
         for (x = 0; x < board_size; ++x) {
             if (color) {
                 if (BOARD(y, x) < ARR_LEN(relation)) {
-                    wbkgd(tiles[y][x], ' ' |
+                    wbkgd(tiles[BOARD_SIZE * y + x], ' ' |
                           COLOR_PAIR(BOARD(y, x)));
                 } else {
-                    wbkgd(tiles[y][x], ' ' | COLOR_PAIR(0));
+                    wbkgd(tiles[BOARD_SIZE * y + x], ' ' | COLOR_PAIR(0));
                 }
             } else {
-                wbkgd(tiles[y][x], ' ' | ((rev)?A_REVERSE:0));
+                wbkgd(tiles[BOARD_SIZE * y + x], ' ' | ((rev)?A_REVERSE:0));
             }
             if (BOARD(y, x) < ARR_LEN(relation)) {
-                mvwprintw(tiles[y][x],
+                mvwprintw(tiles[BOARD_SIZE * y + x],
                           TILE_SIZE/4, 1,
                           "%*s",
                           TILE_SIZE - 2,
                           relation[(size_t)BOARD(y, x)]);
             } else {
-                mvwprintw(tiles[y][x],
+                mvwprintw(tiles[BOARD_SIZE * y + x],
                           TILE_SIZE/4, 1,
                           "2^%d",
                           BOARD(y, x));
             }
-            wrefresh(tiles[y][x]);
+            wrefresh(tiles[BOARD_SIZE * y + x]);
             rev = ~rev;
         }
         rev = ~rev;
