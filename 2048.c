@@ -28,8 +28,7 @@ uint8_t color = 0;
 
 uint8_t game_over = 0;
 
-struct timespec sleep = {0, 150000000};
-struct timespec anim8 = {0,  37500000};
+struct timespec anim8 = {0, 40000000};
 
 const char* const save_file_name = "save.game";
 
