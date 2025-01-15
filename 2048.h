@@ -21,8 +21,6 @@ extern uint8_t color;
 extern uint8_t game_over;
 extern const char* const save_file_name;
 
-extern struct timespec sleep;
-
 extern const char* relation[];
 
 extern unsigned char board[];

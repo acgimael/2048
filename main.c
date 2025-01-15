@@ -66,7 +66,6 @@ int main() {
             break;
         }
         input = 0;
-        nanosleep(&sleep, NULL);
     }
  end:
     save_game();
