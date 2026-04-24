@@ -29,8 +29,6 @@ uint8_t color = 0;
 
 uint8_t game_over = 0;
 
-struct timespec anim8 = {0, 40000000};
-
 const char* const save_file_name = "save.game";
 
 const char* relation[] = {
@@ -354,7 +352,7 @@ inline static void board_step(direction dir) {
     }
     print_board();
 
-    nanosleep(&anim8, NULL);
+    nanosleep(&(struct timespec){0, 40000000}, NULL); /* 40 ms in ns */
     if (moved) {
         moved = 0;
         board_step(dir);
