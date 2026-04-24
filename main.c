@@ -28,6 +28,7 @@ int main() {
         new_game();
     }
 
+    direction dir = none;
  start:
     while (1) {
         if (change) {
@@ -53,18 +54,19 @@ int main() {
         case 'q': case 'Q':
             goto end;
         case KEY_RIGHT:
-            board_move(right);
+            dir = right;
             break;
         case KEY_DOWN:
-            board_move(down);
+            dir = down;
             break;
         case KEY_LEFT:
-            board_move(left);
+            dir = left;
             break;
         case KEY_UP:
-            board_move(up);
+            dir = up;
             break;
         }
+        board_move(dir);
         input = 0;
     }
  end:

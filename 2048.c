@@ -261,6 +261,8 @@ void move_tile(int y, int x,
 inline static void merge(direction dir) {
     int y, x;
     switch (dir) {
+	case none:
+		break;
     case right:
         for (x = BOARD_SIZE - 2; x >= 0; --x) {
             for (y = 0; y < BOARD_SIZE; ++y) {
@@ -294,33 +296,16 @@ inline static void merge(direction dir) {
 
 void board_move(direction dir) {
     move_score = 0;
-    switch(dir) {
-    case right:
-        board_step(right);
-        merge(right);
-        board_step(right);
-        break;
-    case down:
-        board_step(down);
-        merge(down);
-        board_step(down);
-        break;
-    case left:
-        board_step(left);
-        merge(left);
-        board_step(left);
-        break;
-    case up:
-        board_step(up);
-        merge(up);
-        board_step(up);
-        break;
-    }
+	board_step(dir);
+	merge(dir);
+	board_step(dir);
 }
 
 inline static void board_step(direction dir) {
     int y, x;
     switch(dir) {
+	case none:
+		break;
     case right:
         for (x = BOARD_SIZE - 2; x >= 0; --x) {
             for (y = 0; y < BOARD_SIZE; ++y) {

@@ -30,7 +30,7 @@ extern int free_tiles[];
 extern WINDOW* tiles[BOARD_SIZE * BOARD_SIZE];
 
 typedef enum direction {
-    right, down, left, up
+    none = -1, right, down, left, up
 } direction;
 
 void save_game(void);
