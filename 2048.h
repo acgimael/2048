@@ -33,9 +33,26 @@ typedef enum direction {
     none = -1, right, down, left, up
 } direction;
 
-void save_game(void);
+typedef enum serializer_status {
+   SERIALIZER_SUCCESS,
+   SERIALIZER_FOPEN_FAILED,
+   SERIALIZER_MAGIC_NUMBER,
+   SERIALIZER_MAGIC_NUMBER_MISMATCH,
+   SERIALIZER_SAVE_GAME_VERSION,
+   SERIALIZER_SAVE_GAME_VERSION_MISMATCH,
+   SERIALIZER_BOARD_SIZE,
+   SERIALIZER_BOARD_SIZE_MISMATCH,
+   SERIALIZER_SCORE,
+   SERIALIZER_HIGH_SCORE,
+   SERIALIZER_MOVES,
+   SERIALIZER_BOARD_DATA,
+} serializer_status;
 
-int load_game(void);
+extern const char * const file_magic;
+
+serializer_status save_game(const char * const filepath);
+
+serializer_status load_game(const char * const filepath);
 
 void is_game_over(void);
 

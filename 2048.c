@@ -10,6 +10,8 @@
 
 #define MOVE_SCORE_BUFSIZ 20
 
+const char * const file_magic = "2048ACG";
+
 static int moved = 0;
 
 inline static void board_step(direction dir);
@@ -57,95 +59,144 @@ int free_tiles[BOARD_SIZE * BOARD_SIZE];
 
 WINDOW* tiles[BOARD_SIZE * BOARD_SIZE];
 
-void save_game(void) {
-    FILE* fp = fopen(save_file_name, "wb");
-    if (fp) {
-        if (fwrite(&board_size, sizeof(board_size), 1, fp) != 1) {
-            fputs("Could not write the board size "
-                  "to the save game file\n", stderr);
-            exit(EXIT_FAILURE);
-        }
-        uint32_t score_n = htonl(score);
-        if (fwrite(&score_n, sizeof(score_n), 1, fp) != 1) {
-            fputs("Could not write the score "
-                  "to the save game file\n", stderr);
-            exit(EXIT_FAILURE);
-        }
-        if (score > high_score) {
-            high_score = score;
-        }
-        uint32_t high_score_n = htonl(high_score);
-        if (fwrite(&high_score_n, sizeof(high_score_n), 1, fp) != 1) {
-            fputs("Could not write the high score "
-                  "to the save game file\n", stderr);
-            exit(EXIT_FAILURE);
-        }
-        uint32_t moves_n = htonl(moves);
-        if (fwrite(&moves_n, sizeof(moves_n), 1, fp) != 1) {
-            fputs("Could not write the number of moves "
-                  "to the save game file\n", stderr);
-            exit(EXIT_FAILURE);
-        }
-        if (fwrite(board, sizeof(*board), board_size*board_size, fp) !=
-            BOARD_SIZE*BOARD_SIZE) {
-            fputs("Could not write the board data "
-                  "to the save game file\n", stderr);
-            exit(EXIT_FAILURE);
-        }
-        fclose(fp);
+serializer_status save_game(const char * const filepath) {
+    FILE *fp = fopen(filepath, "wb");
+    if (fp == NULL) {
+        return SERIALIZER_FOPEN_FAILED;
     }
+
+    size_t magic_length = 7;
+    if (fwrite(file_magic, sizeof(char), magic_length, fp) != magic_length) {
+        fputs("Could not write the magic number\n", stderr);
+        return SERIALIZER_MAGIC_NUMBER;
+    }
+
+    uint8_t save_game_version = 1;
+    if (fwrite(&save_game_version, sizeof(save_game_version), 1, fp) != 1) {
+        fputs("Could not write the save game version\n", stderr);
+        return SERIALIZER_SAVE_GAME_VERSION;
+    }
+
+    if (fwrite(&board_size, sizeof(board_size), 1, fp) != 1) {
+        fputs("Could not write the board size "
+              "to the save game file\n", stderr);
+        return SERIALIZER_BOARD_SIZE;
+    }
+
+    uint32_t score_n = htonl(score);
+    if (fwrite(&score_n, sizeof(score_n), 1, fp) != 1) {
+        fputs("Could not write the score "
+              "to the save game file\n", stderr);
+        return SERIALIZER_SCORE;
+    }
+
+    if (score > high_score) {
+        high_score = score;
+    }
+    uint32_t high_score_n = htonl(high_score);
+    if (fwrite(&high_score_n, sizeof(high_score_n), 1, fp) != 1) {
+        fputs("Could not write the high score "
+              "to the save game file\n", stderr);
+        return SERIALIZER_HIGH_SCORE;
+    }
+
+    uint32_t moves_n = htonl(moves);
+    if (fwrite(&moves_n, sizeof(moves_n), 1, fp) != 1) {
+        fputs("Could not write the number of moves "
+              "to the save game file\n", stderr);
+        return SERIALIZER_MOVES;
+    }
+
+    if (fwrite(board, sizeof(*board), board_size*board_size, fp) !=
+        BOARD_SIZE*BOARD_SIZE) {
+        fputs("Could not write the board data "
+              "to the save game file\n", stderr);
+        return SERIALIZER_BOARD_DATA;
+    }
+
+    fclose(fp);
+    return SERIALIZER_SUCCESS;
 }
 
-int load_game(void) {
-    int loaded = 0;
-    FILE* fp = fopen(save_file_name, "rb");
-    if (fp) {
-        uint8_t read_board_size = 0;
-        if (fread(&read_board_size, sizeof(read_board_size), 1, fp) != 1) {
-            fputs("Could not read the board size "
-                  "from the save game file\n", stderr);
-            exit(EXIT_FAILURE);
-        } else {
-            if (read_board_size != board_size) {
-                fputs("Save game board size and "
-                      "actual board size do not match\n", stderr);
-                exit(EXIT_FAILURE);
-            }
-        }
-        if (fread(&score, sizeof(score), 1, fp) != 1) {
-            fputs("Could not read the score "
-                  "from the save game file\n", stderr);
-            exit(EXIT_FAILURE);
-        } else {
-            /* convert score to host order */
-            score = ntohl(score);
-        }
-        if (fread(&high_score, sizeof(high_score), 1, fp) != 1) {
-            fputs("Could not read the high score "
-                  "from the save game file\n", stderr);
-            exit(EXIT_FAILURE);
-        } else {
-            /* convert high score to host order */
-            high_score = ntohl(high_score);
-        }
-        if (fread(&moves, sizeof(moves), 1, fp) != 1) {
-            fputs("Could not read the number of moves "
-                  "from the save game file\n", stderr);
-            exit(EXIT_FAILURE);
-        } else {
-            /* convert high score to host order */
-            moves = ntohl(moves);
-        }
-        if (fread(board, sizeof(*board), board_size*board_size, fp) !=
-            BOARD_SIZE*BOARD_SIZE) {
-            fputs("Could not read the board data "
-                  "from the save game file\n", stderr);
-            exit(EXIT_FAILURE);
-        }
-        loaded = 1;
-        fclose(fp);
+serializer_status load_game(const char * const filepath) {
+    FILE *fp = fopen(filepath, "rb");
+    if (fp == NULL) {
+        return SERIALIZER_FOPEN_FAILED;
     }
-    return loaded;
+
+    char read_file_magic[7] = { 0 };
+
+    if (fread(read_file_magic, sizeof(*read_file_magic), ARR_LEN(read_file_magic), fp) != ARR_LEN(read_file_magic)) {
+        fputs("Could not read file magic (signature)\n", stderr);
+        return SERIALIZER_MAGIC_NUMBER;
+    }
+
+    if (memcmp(read_file_magic, file_magic, 7) != 0) {
+        fputs("File magic number is mismatched\n", stderr);
+        return SERIALIZER_MAGIC_NUMBER_MISMATCH;
+    }
+
+    uint8_t version = 0;
+    if (fread(&version, sizeof(version), 1, fp) != 1) {
+        fputs("Could not read save game version\n", stderr);
+        return SERIALIZER_MAGIC_NUMBER;
+    }
+
+    /*
+      if there's ever another version I'll figure out how to deal with that;
+      for now, there's only version 1, which is not even technically the first
+      version
+    */
+    if (version != 1) {
+        fputs("Save game version mismatch\n", stderr);
+        return SERIALIZER_SAVE_GAME_VERSION_MISMATCH;
+    }
+
+    uint8_t read_board_size = 0;
+    if (fread(&read_board_size, sizeof(read_board_size), 1, fp) != 1) {
+        fputs("Could not read the board size "
+              "from the save game file\n", stderr);
+        return SERIALIZER_BOARD_SIZE;
+    } else {
+        if (read_board_size != board_size) {
+            fputs("Save game board size and "
+                  "actual board size do not match\n", stderr);
+            return SERIALIZER_BOARD_SIZE_MISMATCH;
+        }
+    }
+    if (fread(&score, sizeof(score), 1, fp) != 1) {
+        fputs("Could not read the score "
+              "from the save game file\n", stderr);
+        return SERIALIZER_SCORE;
+    } else {
+        /* convert score to host order */
+        score = ntohl(score);
+    }
+    if (fread(&high_score, sizeof(high_score), 1, fp) != 1) {
+        fputs("Could not read the high score "
+              "from the save game file\n", stderr);
+        return SERIALIZER_HIGH_SCORE;
+    } else {
+        /* convert high score to host order */
+        high_score = ntohl(high_score);
+    }
+    if (fread(&moves, sizeof(moves), 1, fp) != 1) {
+        fputs("Could not read the number of moves "
+              "from the save game file\n", stderr);
+        return SERIALIZER_MOVES;
+    } else {
+        /* convert high score to host order */
+        moves = ntohl(moves);
+    }
+    if (fread(board, sizeof(*board), board_size*board_size, fp) !=
+        BOARD_SIZE*BOARD_SIZE) {
+        fputs("Could not read the board data "
+              "from the save game file\n", stderr);
+        return SERIALIZER_BOARD_DATA;
+    }
+
+    fclose(fp);
+    return SERIALIZER_SUCCESS;
 }
 
 void is_game_over() {

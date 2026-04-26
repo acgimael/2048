@@ -24,7 +24,8 @@ int main() {
 
     int input = 0;
 
-    if (!load_game()) {
+    serializer_status status = load_game(save_file_name);
+    if (status != SERIALIZER_SUCCESS) {
         new_game();
     }
 
@@ -70,10 +71,15 @@ int main() {
         input = 0;
     }
  end:
-    save_game();
-
     del_tiles();
 
     endwin();
+
+    status = save_game(save_file_name);
+
+    if (status != SERIALIZER_SUCCESS) {
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
