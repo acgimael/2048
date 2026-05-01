@@ -30,8 +30,8 @@ int main() {
     }
 
     direction dir = none;
- start:
     while (1) {
+        dir = none;
         if (change) {
             change = 0;
             moves += 1;
@@ -51,7 +51,7 @@ int main() {
         switch (input) {
         case 'n': case 'N':
             new_game();
-            goto start;
+            continue;
         case 'q': case 'Q':
             goto end;
         case KEY_RIGHT:
