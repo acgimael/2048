@@ -354,6 +354,7 @@ void board_move(direction dir) {
 
 inline static void board_step(direction dir) {
     int y, x;
+start:
     switch(dir) {
     case none:
         break;
@@ -391,7 +392,7 @@ inline static void board_step(direction dir) {
     nanosleep(&(struct timespec){0, 40000000}, NULL); /* 40 ms in ns */
     if (moved) {
         moved = 0;
-        board_step(dir);
+        goto start;
     }
 }
 
