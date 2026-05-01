@@ -139,7 +139,7 @@ serializer_status load_game(const char * const filepath) {
     uint8_t version = 0;
     if (fread(&version, sizeof(version), 1, fp) != 1) {
         fputs("Could not read save game version\n", stderr);
-        return SERIALIZER_MAGIC_NUMBER;
+        return SERIALIZER_SAVE_GAME_VERSION;
     }
 
     /*
