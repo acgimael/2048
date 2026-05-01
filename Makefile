@@ -1,12 +1,11 @@
-LDLIBS = $$(pkg-config --libs ncurses)
+CFLAGS = -Os -Wall -Wextra
 
-CFLAGS = -march=native -mtune=native -O3 -Wall -Wextra
+LDLIBS = $$(pkg-config --libs ncurses)
 
 NAME = 2048
 
 $(NAME): $(NAME).o main.o
 
+.PHONY: clean
 clean:
 	rm -f $(NAME) *.o
-
-.phony: clean
