@@ -51,7 +51,7 @@ convert old files to this new format, you can run the following small snippet of
 code in the terminal:
 
 ```sh
-cp save.game save.game.backup && printf '2048ACG\x1' | cat - save.game > tmp && mv temp save.game
+cp save.game save.game.backup && printf '2048ACG\x1' | cat - save.game > tmp && mv tmp save.game
 ```
 
 This small command creates a copy of the file as a backup, and then simply
