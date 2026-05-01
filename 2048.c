@@ -468,15 +468,4 @@ void do_initialize_colors(void) {
     init_pair(15, COLOR_GREEN, COLOR_RED);
     init_pair(16, COLOR_GREEN, COLOR_WHITE);
     init_pair(17, COLOR_GREEN, COLOR_YELLOW);
-    init_pair(18, COLOR_GREEN, COLOR_BLUE);
-    init_pair(19, COLOR_GREEN, COLOR_MAGENTA);
-    init_pair(20, COLOR_GREEN, COLOR_CYAN);
-    init_pair(21, COLOR_GREEN, COLOR_WHITE);
-    init_pair(22, COLOR_YELLOW, COLOR_RED);
-    init_pair(23, COLOR_YELLOW, COLOR_GREEN);
-    init_pair(24, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(25, COLOR_YELLOW, COLOR_BLUE);
-    init_pair(26, COLOR_YELLOW, COLOR_MAGENTA);
-    init_pair(27, COLOR_YELLOW, COLOR_CYAN);
-    init_pair(28, COLOR_YELLOW, COLOR_WHITE);
 }
